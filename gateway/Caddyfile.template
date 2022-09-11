@@ -1,0 +1,12 @@
+{
+    http_port 8080
+    https_port 8443
+}
+
+$LINK_DOMAIN {
+    handle /.well-known/fractalnetworks/health {
+	    respond "OK" 200
+	}
+
+    reverse_proxy $EXPOSE
+}

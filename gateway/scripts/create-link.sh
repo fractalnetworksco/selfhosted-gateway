@@ -4,8 +4,9 @@ set -euo pipefail
 
 SSH_HOST=$1
 export LINK_DOMAIN=$2
-export CONTAINER_NAME=$3
-export EXPOSE=$4
+# convert fqdn to container name
+export CONTAINER_NAME=$(echo $LINK_DOMAIN|python3 -c 'fqdn = input(); print("-".join(fqdn.split(".")[-3:]))')
+export EXPOSE=$3
 export WG_PRIVKEY=$(wg genkey)
 
 

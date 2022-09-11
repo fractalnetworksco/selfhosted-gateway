@@ -2,9 +2,19 @@ server {
     listen       80;
     listen  [::]:80;
     #server_name  ^(?<sub>\.)?(?<domain>.+)$;
-    #server_name "~^(?<subdomain>.+)\.(?<domain>.+)\.(?<tld>.+)$" "~^.+\.(?<subdomain>.+)\.(?<domain>.+)\.(?<tld>.+)$";
-    server_name "~^(?<optional>.+\.)?(?<subdomain>.+)\.(?<domain>.+)\.(?<tld>.+)$";
+    server_name "~^(?<app>.+?)?\.(?<subdomain>.+?)?\.(?<domain>.+)\.(?<tld>.+)$" "~^(?<subdomain>.+)\.(?<domain>.+)\.(?<tld>.+)$" "~^(?<domain>.+)\.(?<tld>.+)$";
     #access_log  /var/log/nginx/host.access.log  main;
+
+        set $target http://$subdomain-$domain-$tld;
+	if ($subdomain = '') {
+            set $target http://$domain-$tld;
+	}
+
+	location /test {
+	    add_header Content-Type text/plain;
+	    return 200 "target: $target \napp: $app - subdomain: $subdomain - domain: $domain.$tld";
+	}
+
 
 	location / {
 		# First attempt to serve request as file, then
@@ -12,7 +22,6 @@ server {
 		#try_files $uri $uri/ =404;
         # use Docker resolver
 		resolver 127.0.0.11;
-        set $target http://$subdomain-$domain-$tld;
 		proxy_pass $target;
 		proxy_set_header Host            $host;
 		proxy_set_header X-Forwarded-For $remote_addr;

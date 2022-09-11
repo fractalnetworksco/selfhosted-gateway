@@ -1,0 +1,13 @@
+FROM alpine:latest
+
+ARG RELEASE_TAG
+
+COPY client-entrypoint.sh /usr/bin/client-entrypoint.sh
+
+COPY Caddyfile.template /etc/Caddyfile.template
+
+RUN apk add gettext wireguard-tools caddy
+
+ENV NOTEWORTHY_ENV $RELEASE_TAG
+
+ENTRYPOINT [ "client-entrypoint.sh" ]

@@ -1,6 +1,8 @@
 #!/bin/sh
 
-wg genkey > /etc/wireguard/link0.key
+WG_PRIVKEY=$(wg genkey)
+echo $WG_PRIVKEY > /etc/wireguard/link0.key
+
 
 ip link add link0 type wireguard
 

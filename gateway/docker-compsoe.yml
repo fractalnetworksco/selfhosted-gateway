@@ -3,5 +3,7 @@ services:
     nginx:
         image: fractalnetworks/gateway:latest
         environment:
-            GATEWAY_DOMAIN: $GATEWAY_DOMAIN
             NGINX_ENVSUBST_OUTPUT_DIR: /etc/nginx
+        ports:
+            - 80:80
+            - 443:443

@@ -1,0 +1,7 @@
+  link:
+    image: fractalnetworks/gateway-client:latest
+    environment:
+      LINK_DOMAIN: ${LINK_DOMAIN}
+      EXPOSE: ${EXPOSE}
+      GATEWAY_CLIENT_WG_PRIVKEY: ${WG_PRIVKEY}
+      GATEWAY_ENDPOINT: ${GATEWAY_ENDPOINT}

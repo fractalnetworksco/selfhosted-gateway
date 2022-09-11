@@ -30,9 +30,10 @@ events {
   }
 
     stream {  
-
         map $ssl_preread_server_name $targetBackend {
-            ~^(?<optional>.+\.)?(?<subdomain>.+)\.(?<domain>.+)\.(?<tld>.+)$ $subdomain-$domain-$tld:443;
+            ~^(?<app>.+?)?\.(?<subdomain>.+?)?\.(?<domain>.+)\.(?<tld>.+)$ $subdomain-$domain-$tld:443;
+            ~^(?<subdomain>.+?)?\.(?<domain>.+)\.(?<tld>.+)$ $subdomain-$domain-$tld:443;
+            ~^(?<domain>.+)\.(?<tld>.+)$ $domain-$tld:443;
         } 
 
         server {

@@ -1,0 +1,11 @@
+FROM alpine:latest
+
+ARG RELEASE_TAG
+
+ADD link-entrypoint.sh /usr/bin/link-entrypoint.sh
+
+RUN apk add iptables socat wireguard-tools
+
+ENV NOTEWORTHY_ENV $RELEASE_TAG
+
+ENTRYPOINT [ "link-entrypoint.sh" ]

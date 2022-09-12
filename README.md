@@ -28,17 +28,19 @@ Similar products:
 - Docker Compose (optional)
 
 ## Example Usage
-1. Launch the Gateway host (example gateway.selfhosted.pub)
+1. Launch the Fractal Gateway service (on Cloud VPS)
 ```
 $ docker network create gateway
-$ docker run --network gateway  -p 80:80 -p 443:443 -e NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx -it fractalnetworks/gateway:latest
+$ docker run --network gateway --restart unless-stopped -p 80:80 -p 443:443 -e NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx -it fractalnetworks/gateway:latest
 ```
-2. From the client, generate a Docker Compose snippet to expose an `nginx` container to the world at `nginx.selfhosted.pub` 
+2. From your local network, generate a Docker Compose snippet that will expose the Docker Compose `nginx` service to the world at `nginx.selfhosted.pub` 
 ```
 # usage: ./gateway/scripts/create-link.sh user@ssh_host public_fdqn service:port
-# We use ssh to configure the Fractal Gateway, the following command create a service snippet to be added to the docker-compose.yml file
+# We use ssh to configure the Fractal Gateway, the following command creates a service snippet that can be added to any docker-compose.yml
 
 $ ./gateway/scripts/create-link.sh root@gateway.selfhosted.pub nginx.selfhosted.pub nginx:80
+# add the following to your docker-compose.yml file
+
   link:
     image: fractalnetworks/gateway-client:latest
     environment:
@@ -51,9 +53,7 @@ $ ./gateway/scripts/create-link.sh root@gateway.selfhosted.pub nginx.selfhosted.
       - NET_ADMIN
 ```
 
-Add the generated snippet to a `docker-compose.yml` file.
-
-Here's the complete file:
+3. Adding the generated snippet to a `docker-compose.yml` file we get:
 ```
 version: '3.9'
 services:
@@ -70,7 +70,7 @@ services:
     cap_add:
       - NET_ADMIN
 ```
-Run `docker-compose up -d` then visit https://nginx.selfhosted.pub
+4. Run `docker-compose up -d` then visit https://nginx.selfhosted.pub
 
 ## Support
 Community support is available via our Matrix Channel https://matrix.to/#/#fractal:ether.ai

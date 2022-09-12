@@ -3,6 +3,7 @@
 This is a lighweight implementation of the Fractal Gateway RPoVPN.
 
 It combines Docker, Nginx and WireGuard in a novel way to enable self-hosted connectivity to your self-hosted applications.
+Inspired by: https://gist.github.com/kekru/c09dbab5e78bf76402966b13fa72b9d2
 
 Similar products:
 - Cloudflare Argo Tunnels

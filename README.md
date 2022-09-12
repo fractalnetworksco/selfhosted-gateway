@@ -2,7 +2,15 @@
 
 This is a lighweight implementation of the Fractal Gateway RPoVPN.
 
-It combines Docker, Nginx and WireGuard in a novel way to enable painless self-hosting at home from behind cloud based proxy.
+It combines Docker, Nginx and WireGuard in a novel way to enable self-hosted connectivity to your self-hosted applications.
+
+Similar products:
+- Cloudflare Argo Tunnels
+- ngrok
+- Inlets
+- Pagekite
+- Tailscale
+- Zerotier
 
 ## Reverse Proxy-over-VPN (RPoVPN)
 1. **RPoVPN is a common strategy for self-hosting private services from home while elimating the need for complex local network configuration changes such as:**

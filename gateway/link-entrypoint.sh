@@ -24,8 +24,8 @@ iptables -A FORWARD -i link0 -o eth0 -m conntrack --ctstate ESTABLISHED,RELATED 
 iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j DNAT --to-destination 10.0.0.2:8080
 iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 443 -j DNAT --to-destination 10.0.0.2:8443
 
-iptables -t nat -A POSTROUTING -o link0 -p tcp --dport 8080 -j SNAT --to-source 10.0.0.1:80
-iptables -t nat -A POSTROUTING -o link0 -p tcp --dport 8443 -j SNAT --to-source 10.0.0.1:443
+iptables -t nat -A POSTROUTING -o link0 -p tcp --dport 8080 -j SNAT --to-source 10.0.0.1
+iptables -t nat -A POSTROUTING -o link0 -p tcp --dport 8443 -j SNAT --to-source 10.0.0.1
 
 # generic udp proxies
 socat UDP4-RECVFROM:18522,fork UDP4-SENDTO:10.0.0.2:18522,sp=18524,reuseaddr &

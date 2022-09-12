@@ -3,9 +3,10 @@
 This is a simplified implementation of the Fractal Gateway RPoVPN. It combines Docker, Nginx and WireGuard in a novel way to enable painless self-hosting behind a cloud based gateway.
 
 ## Dependencies
-- Public accessible web server
-- SSH access (managment is done via ssh see `scripts/_create-link.sh`
-- Docker
+- Publicly accessible web server
+- SSH access (managment is done via ssh see `gateway/scripts/create-link.sh`
+- Docker (on Gateway, local optional)
+- Docker Compose (optional)
 
 ## Example Usage
 Generate a Docker Compose snippet to expose an `nginx` container to the world at `nginx.selfhosted.pub` 

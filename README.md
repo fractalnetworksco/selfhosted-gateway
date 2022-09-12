@@ -1,11 +1,22 @@
-# selfhosted-gateway
+# Self-hosted Fractal Gateway
 
-This is a simplified implementation of the Fractal Gateway RPoVPN. It combines Docker, Nginx and WireGuard in a novel way to enable painless self-hosting behind a cloud based gateway.
+This is a lighweight implementation of the Fractal Gateway RPoVPN.
+
+It combines Docker, Nginx and WireGuard in a novel way to enable painless self-hosting at home from behind cloud based proxy.
+
+## Reverse Proxy-over-VPN (RPoVPN)
+1. **RPoVPN is a common strategy for self-hosting private services from home while elimating the need for complex local network configuration changes such as:**
+  - Opening ports on your local Internet router or firewall
+  - using a dynamic DNS provider due to the lack of a static IP
+
+2. **Using Fractal Gateway RPoVPN is ideal for self-hosting from both a network security and privacy perspective:**
+  - Fractal Gateway RPoVPN eliminates the need to expose your home IP address to the public.
+  - Fractal Gateway RPoVPN uses advanced network isolation capabilities of Docker and the Linux kernel to keep self-hosted services isolated from your home network and other self-hosted services.
 
 ## Dependencies
-- Publicly accessible web server
-- SSH access (managment is done via ssh see `gateway/scripts/create-link.sh`
-- Docker (on Gateway, local optional)
+- Publicly accessible host with open tcp ports 80/443 and udp port range `/proc/sys/net/ipv4/ip_local_port_range`
+- SSH access (gateway is managed via SSH, see `gateway/scripts/create-link.sh`
+- Docker (required on Gateway, optional for client)
 - Docker Compose (optional)
 
 ## Example Usage
@@ -42,4 +53,7 @@ services:
     cap_add:
       - NET_ADMIN
 ```
-Now run `docker-compose up -d` then visit https://nginx.selfhosted.pub
+Run `docker-compose up -d` then visit https://nginx.selfhosted.pub
+
+## Support
+Community support is available via our Matrix Channel https://matrix.to/#/#fractal:ether.ai

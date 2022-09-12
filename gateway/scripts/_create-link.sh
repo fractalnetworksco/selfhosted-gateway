@@ -1,7 +1,6 @@
 #!/bin/bash
 set -euo pipefail
-# launch gateway
-#docker run --network gateway  -p 80:80 -p 443:443 -e NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx -it fractalnetworks/gateway:latest
+
 CONTAINER_NAME=$1
 LINK_CLIENT_WG_PUBKEY=$2
 

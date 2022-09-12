@@ -28,9 +28,17 @@ Similar products:
 - Docker Compose (optional)
 
 ## Example Usage
-Generate a Docker Compose snippet to expose an `nginx` container to the world at `nginx.selfhosted.pub` 
+1. Launch the Gateway host (example gateway.selfhosted.pub)
 ```
-$ ./scripts/create-link.sh root@gateway.selfhosted.pub nginx.selfhosted.pub nginx:80
+$ docker network create gateway
+$ docker run --network gateway  -p 80:80 -p 443:443 -e NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx -it fractalnetworks/gateway:latest
+```
+2. From the client, generate a Docker Compose snippet to expose an `nginx` container to the world at `nginx.selfhosted.pub` 
+```
+# usage: ./gateway/scripts/create-link.sh user@ssh_host public_fdqn service:port
+# We use ssh to configure the Fractal Gateway, the following command create a service snippet to be added to the docker-compose.yml file
+
+$ ./gateway/scripts/create-link.sh root@gateway.selfhosted.pub nginx.selfhosted.pub nginx:80
   link:
     image: fractalnetworks/gateway-client:latest
     environment:
@@ -42,6 +50,7 @@ $ ./scripts/create-link.sh root@gateway.selfhosted.pub nginx.selfhosted.pub ngin
     cap_add:
       - NET_ADMIN
 ```
+
 Add the generated snippet to a `docker-compose.yml` file.
 
 Here's the complete file:

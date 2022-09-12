@@ -27,19 +27,19 @@ Similar products:
 - Docker (required on Gateway, optional for client)
 - Docker Compose (optional)
 
-## Example Usage
+## Get started
 1. Launch the Fractal Gateway service (on Cloud VPS)
 ```
-$ docker network create gateway
-$ docker run --network gateway --restart unless-stopped -p 80:80 -p 443:443 -e NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx -it fractalnetworks/gateway:latest
+$ make setup
+$ make gateway
 ```
 2. From your local network, generate a Docker Compose snippet that will expose the Docker Compose `nginx` service to the world at `nginx.selfhosted.pub` 
 ```
-# usage: ./gateway/scripts/create-link.sh user@ssh_host public_fdqn service:port
 # We use ssh to configure the Fractal Gateway, the following command creates a service snippet that can be added to any docker-compose.yml
 
-$ ./gateway/scripts/create-link.sh root@gateway.selfhosted.pub nginx.selfhosted.pub nginx:80
-# add the following to your docker-compose.yml file
+$ make docker
+$ make link GATEWAY=root@gateway.selfhosted.pub FQDN=nginx.selfhosted.pub EXPOSE=nginx:80
+# add the following to any docker-compose.yml file for instant connectivity
 
   link:
     image: fractalnetworks/gateway-client:latest
@@ -53,7 +53,7 @@ $ ./gateway/scripts/create-link.sh root@gateway.selfhosted.pub nginx.selfhosted.
       - NET_ADMIN
 ```
 
-3. Adding the generated snippet to a `docker-compose.yml` file we get:
+3. Adding the generated snippet to a sample `docker-compose.yml` file we get:
 ```
 version: '3.9'
 services:

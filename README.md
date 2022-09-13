@@ -23,21 +23,28 @@ Similar products:
   - Fractal Gateway RPoVPN uses advanced network isolation capabilities of Docker and the Linux kernel to keep self-hosted services isolated from your home network and other self-hosted services.
 
 ## Dependencies
+- Custom Apex Domain for example selfhosted.pub 
 - Publicly accessible host with open tcp ports 80/443 and udp port range `/proc/sys/net/ipv4/ip_local_port_range`
 - SSH access (gateway is managed via SSH, see `gateway/scripts/create-link.sh`
 - Docker (required on Gateway, optional for client)
 - Docker Compose (optional)
 
 ## Get started
-1. Launch the Fractal Gateway service (on Cloud VPS)
+
+**Point \*.selfhosted.pub (DNS A Record) to the IPv4 address of your Gateway host.**
+
+1. Launch the Fractal Gateway service (nginx) (on Cloud VPS)
 ```
 $ make setup
 $ make gateway
 ```
-2. From your local network, generate a Docker Compose snippet that will expose the Docker Compose `nginx` service to the world at `nginx.selfhosted.pub` 
-```
-# We use ssh to configure the Fractal Gateway, the following command creates a service snippet that can be added to any docker-compose.yml
 
+ A link is a dedicated WireGuard tunnel that has host name routed and SNI routed traffic to port 8080 and 8433 of the Caddy based `fractalnetworks/gateway-client:latest` container
+
+SSH is used to communicate with the Gateway when creating links.
+2. From your local network the following command will generate a Docker Compose snippet that will expose the Docker Compose `nginx` listening on port `80` to the world at `https://nginx.selfhosted.pub` 
+
+```
 $ make docker
 $ make link GATEWAY=root@gateway.selfhosted.pub FQDN=nginx.selfhosted.pub EXPOSE=nginx:80
 # add the following to any docker-compose.yml file for instant connectivity
@@ -54,7 +61,7 @@ $ make link GATEWAY=root@gateway.selfhosted.pub FQDN=nginx.selfhosted.pub EXPOSE
       - NET_ADMIN
 ```
 
-3. Adding the generated snippet to a sample `docker-compose.yml` file we get:
+3. Adding the generated snippet to sample nginx `docker-compose.yml` file we get:
 ```
 version: '3.9'
 services:
@@ -71,7 +78,10 @@ services:
     cap_add:
       - NET_ADMIN
 ```
-4. Run `docker-compose up -d` then visit https://nginx.selfhosted.pub
+4. Run `docker-compose up -d` and see that your local nginx container is accessible to the world with a valid TSL certificate (via Caddy Automatic HTTPS) at https://nginx.selfhosted.pub
+
+## Limitations
+- Currently only IPv4 is supported
 
 ## Support
 Community support is available via our Matrix Channel https://matrix.to/#/#fractal:ether.ai

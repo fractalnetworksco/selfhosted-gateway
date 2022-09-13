@@ -14,7 +14,7 @@ Similar products:
 - Zerotier
 
 ## Reverse Proxy-over-VPN (RPoVPN)
-1. **RPoVPN is a common strategy for self-hosting private services from home while elimating the need for complex local network configuration changes such as:**
+1. **RPoVPN is a common strategy for self-hosting publicly accessible services from home while elimating the need for complex local network configuration changes such as:**
   - Opening ports on your local Internet router or firewall
   - using a dynamic DNS provider due to the lack of a static IP
 

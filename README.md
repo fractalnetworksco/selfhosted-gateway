@@ -16,16 +16,17 @@ Similar products:
 ## Reverse Proxy-over-VPN (RPoVPN)
 1. **RPoVPN is a common strategy for self-hosting publicly accessible services from home while elimating the need for complex local network configuration changes such as:**
   - Opening ports on your local Internet router or firewall
-  - using a dynamic DNS provider due to the lack of a static IP
+  - Using a dynamic DNS provider due to a lack of a static IP
+  - Self-hosting via an ISP that deploys CGNAT (Starlink, T-mobile Home Internet)
 
-2. **Using Fractal Gateway RPoVPN is ideal for self-hosting from both a network security and privacy perspective:**
-  - Fractal Gateway RPoVPN eliminates the need to expose your home IP address to the public.
-  - Fractal Gateway RPoVPN uses advanced network isolation capabilities of Docker and the Linux kernel to keep self-hosted services isolated from your home network and other self-hosted services.
+2. **Using RPoVPN is ideal for self-hosting from both a network security and privacy perspective:**
+  - RPoVPN eliminates the need to expose your home IP address to the public.
+  - Fractal Gateway RPoVPN uses advanced network isolation capabilities of the Linux kernel (network namespaces) to keep self-hosted services isolated from your home network and your other local / self-hosted services.
 
 ## Dependencies
-- Custom Apex Domain for example selfhosted.pub 
+- A custom apex domain for example **selfhosted.pub** 
 - Publicly accessible host with open tcp ports 80/443 and udp port range `/proc/sys/net/ipv4/ip_local_port_range`
-- SSH access (gateway is managed via SSH, see `gateway/scripts/create-link.sh`
+- SSH access (management is SSH based, see `gateway/scripts/create-link.sh`
 - Docker (required on Gateway, optional for client)
 - Docker Compose (optional)
 
@@ -39,10 +40,11 @@ $ make setup
 $ make gateway
 ```
 
- A link is a dedicated WireGuard tunnel that has host name routed and SNI routed traffic to port 8080 and 8433 of the Caddy based `fractalnetworks/gateway-client:latest` container
+A link is a dedicated WireGuard tunnel that has host name routed and SNI routed traffic to port 8080 and 8433 of the Caddy based `fractalnetworks/gateway-client:latest` container
 
-SSH is used to communicate with the Gateway when creating links.
-2. From your local network the following command will generate a Docker Compose snippet that will expose the Docker Compose `nginx` listening on port `80` to the world at `https://nginx.selfhosted.pub` 
+SSH is used to communicate with the Gateway to create links.
+
+2. From the machine you would like to expose to the public Internet, run the following command to generate a Docker Compose snippet that will expose the hypothetical Docker Compose service `nginx`, listening on port `80` to the world at `https://nginx.selfhosted.pub` 
 
 ```
 $ make docker
@@ -78,10 +80,21 @@ services:
     cap_add:
       - NET_ADMIN
 ```
+
+Notice that it is **NOT necessary** to specify the following in the above docker-compose file:
+```
+ports:
+ - 80:80
+ - 443:443
+```
+
+All traffic(80/443) will be routed through your public Fractal Gateway.
+
 4. Run `docker-compose up -d` and see that your local nginx container is accessible to the world with a valid TSL certificate (via Caddy Automatic HTTPS) at https://nginx.selfhosted.pub
 
 ## Limitations
 - Currently only IPv4 is supported
+- Raw UDP proxying is supported but currently untested & undocumented, see bottom of `gateway/link-entrypoint.sh` for more information.
 
 ## Support
 Community support is available via our Matrix Channel https://matrix.to/#/#fractal:ether.ai

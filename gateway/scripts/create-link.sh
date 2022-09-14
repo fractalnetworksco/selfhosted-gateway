@@ -1,7 +1,7 @@
 #!/bin/bash
 # usage: create-link.sh root@gateway.selfhosted.pub selfhosted.pub nginx:80
 
-set -euo pipefail
+set -e
 
 SSH_HOST=$1
 export LINK_DOMAIN=$2

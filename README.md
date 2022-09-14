@@ -90,7 +90,7 @@ ports:
 
 All traffic(80/443) will be routed through your public Fractal Gateway.
 
-4. Run `docker-compose up -d` and see that your local nginx container is accessible to the world with a valid TSL certificate (via Caddy Automatic HTTPS) at https://nginx.selfhosted.pub
+4. Run `docker-compose up -d` and see that your local nginx container is accessible to the world with a valid TLS certificate (via Caddy Automatic HTTPS) at https://nginx.selfhosted.pub
 
 ## Limitations
 - Currently only IPv4 is supported

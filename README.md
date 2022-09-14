@@ -3,7 +3,10 @@
 This is a lighweight implementation of the Fractal Gateway RPoVPN.
 
 It combines Docker, Nginx and WireGuard in a novel way to enable self-hosted connectivity to your self-hosted applications.
-Inspired by: https://gist.github.com/kekru/c09dbab5e78bf76402966b13fa72b9d2
+
+Inspired by: http://widgetsandshit.com/teddziuba/2010/10/taco-bell-programming.html
+
+And: https://gist.github.com/kekru/c09dbab5e78bf76402966b13fa72b9d2
 
 Similar products:
 - Cloudflare Argo Tunnels
@@ -90,7 +93,7 @@ ports:
 
 All traffic(80/443) will be routed through your public Fractal Gateway.
 
-4. Run `docker-compose up -d` and see that your local nginx container is accessible to the world with a valid TSL certificate (via Caddy Automatic HTTPS) at https://nginx.selfhosted.pub
+4. Run `docker-compose up -d` and see that your local nginx container is accessible to the world with a valid TLS certificate (via Caddy Automatic HTTPS) at https://nginx.selfhosted.pub
 
 ## Limitations
 - Currently only IPv4 is supported

@@ -1,5 +1,6 @@
 #!/bin/bash
-set -x
+
+set -e
 
 CONTAINER_NAME=$1
 LINK_CLIENT_WG_PUBKEY=$2

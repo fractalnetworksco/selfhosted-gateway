@@ -14,6 +14,5 @@ WIREGUARD_PORT=$(docker port $CONTAINER_NAME 18521/udp| head -n 1| sed "s/0\.0\.
 # get public ipv4 address
 GATEWAY_IP=$(curl -s 4.icanhazip.com)
 
-echo "export GATEWAY_LINK_WG_PUBKEY=$GATEWAY_LINK_WG_PUBKEY"
-echo "export GATEWAY_ENDPOINT=$GATEWAY_IP:$WIREGUARD_PORT"
+echo "$GATEWAY_LINK_WG_PUBKEY $GATEWAY_IP:$WIREGUARD_PORT"
 

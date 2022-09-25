@@ -1,8 +1,8 @@
 # Self-hosted Fractal Gateway
 
-This is a lighweight implementation of the Fractal Gateway RPoVPN.
+Lighweight, no-code implementation of the Fractal Gateway RPoVPN.
 
-It combines Docker, Nginx and WireGuard in a novel way to enable self-hosted connectivity to your self-hosted applications.
+Combines Docker, Nginx and WireGuard to enable self-hosted connectivity to your self-hosted applications.
 
 Inspired by: http://widgetsandshit.com/teddziuba/2010/10/taco-bell-programming.html
 
@@ -13,9 +13,12 @@ Similar products:
 - ngrok
 - Inlets
 - Pagekite
-- Tailscale
-- Zerotier
+- PacketRiot
+- Tailscale (roadmap)
+- Zerotier (roadmap)
 
+## architectural Overview
+![selfhosted-gateway](https://user-images.githubusercontent.com/109041/192158916-a2cc9f80-9c8d-455f-80d7-fb51e3c275a7.png)
 ## Reverse Proxy-over-VPN (RPoVPN)
 1. **RPoVPN is a common strategy for self-hosting publicly accessible services from home while elimating the need for complex local network configuration changes such as:**
   - Opening ports on your local Internet router or firewall

@@ -14,5 +14,14 @@ ip link set link0 mtu $LINK_MTU
 
 wg set link0 peer $GATEWAY_LINK_WG_PUBKEY allowed-ips 10.0.0.1/32 persistent-keepalive 30 endpoint $GATEWAY_ENDPOINT
 
-envsubst < /etc/Caddyfile.template > /etc/Caddyfile
-caddy run --config /etc/Caddyfile
+if [ -z ${FORWARD_ONLY+x} ]
+then
+    echo "Using caddy with SSL termination to forward traffic to app."
+    envsubst < /etc/Caddyfile.template > /etc/Caddyfile
+    caddy run --config /etc/Caddyfile
+else
+    echo "Caddy is disabled. Using socat to forward traffic to app."
+    socat TCP4-LISTEN:8080,fork,reuseaddr TCP4:$EXPOSE,reuseaddr &
+    socat TCP4-LISTEN:8443,fork,reuseaddr TCP4:$EXPOSE_HTTPS,reuseaddr
+fi
+

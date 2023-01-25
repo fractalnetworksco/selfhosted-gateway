@@ -1,59 +1,65 @@
 # Self-hosted Gateway
 
-Lightweight, no-code implementation of the Fractal Gateway RPoVPN.
+This project automates the provisioning of WireGuard reverse proxy tunnels for self-hosting with `docker compose`. It was designed to provide a fully self-hosted alternative to Cloudflare Tunnels or Tailscale Funnel. Best of all there's no code or APIs. Just an ultra generic nginx config and a short bash script.
 
-Combine Docker, Nginx and WireGuard to enable self-hosted connectivity to your self-hosted applications.
 
-Inspired by: http://widgetsandshit.com/teddziuba/2010/10/taco-bell-programming.html & https://gist.github.com/kekru/c09dbab5e78bf76402966b13fa72b9d2
+It works by generating a docker compose snippet that you can add to your existing docker compose files. The `EXPOSED` docker compose service will then be publically accessible.
 
-Similar products:
-- Cloudflare Argo Tunnels
-- ngrok
-- Inlets
-- Pagekite
-- Packetriot
-- frp (Fast Reverse Proxy)
-- Tailscale (roadmap)
-- Zerotier (roadmap)
 
-## Architectural Overview
-![selfhosted-gateway](https://user-images.githubusercontent.com/109041/192158916-a2cc9f80-9c8d-455f-80d7-fb51e3c275a7.png)
+Full `docker-compose.yml` example:
+```
+version: '3.9'
+services:
+  nginx:
+    image: nginx:latest
+  link:
+    image: fractalnetworks/gateway-client:latest
+    environment:
+      LINK_DOMAIN: nginx.mydomain.com
+      EXPOSE: nginx:80
+      GATEWAY_CLIENT_WG_PRIVKEY: 4M7Ap0euzTxq7gTA/WIYIt3nU+i2FvHUc9eYTFQ2CGI=
+      GATEWAY_LINK_WG_PUBKEY: Wipd6Pv7ttmII4/Oj82I5tmGZwuw6ucsE3G+hwsMR08=
+      GATEWAY_ENDPOINT: 5.125.122.12:49185 
+    cap_add:
+      - NET_ADMIN
+```
+The above example deploys a publically accessible nginx server at https://nginx.mydomain.com -- TLS certs are provisioned by Caddy's Automatic HTTPS feature via Let's Encrypt.
 
-## Reverse Proxy-over-VPN (RPoVPN)
-1. **RPoVPN is a common strategy for self-hosting publicly accessible services from home, providing alternatives to and workarounds for:**
-  - Opening ports on your local Internet router or firewall
-  - Using a dynamic DNS provider due to a lack of a static IP
+## Background
+
+Reverse Proxy-over-VPN (RPoVPN)
+
+1. **RPoVPN is a common strategy for self-hosting publicly accessible services from home, providing fully self-managed alternatives to / workarounds for:**
+  - Proprietary connectivy service providers such as Cloudflare, Tailscale or ngrok
+  - The need to open ports on your home router or firewall
+  - The need to use a dynamic DNS provider due to a lack of a static IP
   - Self-hosting behind double-NAT or via an ISP that does CGNAT (Starlink, T-mobile Home Internet)
 
 2. **Using RPoVPN is ideal for self-hosting from both a network security and privacy perspective:**
-  - RPoVPN eliminates the need to expose your public IP address to the world.
-  - Fractal Gateway RPoVPN uses advanced network isolation capabilities of the Linux kernel (network namespaces) to keep self-hosted services isolated from your home network and your other local / self-hosted services.
+  - RPoVPN eliminates the need to expose your home public IP address to the world.
+  - Selfhosted gateway uses advanced network isolation capabilities of Docker (via Linux network namespaces) to isolate your self-hosted services from your home network and your other docker self-hosted services.
 
 ## Terminology
-- `Link` - A dedicated WireGuard tunnel between a local container (client) and the remote Link container running on the Gateway through which Reverse Proxy traffic is routed.
+- `Link` - A dedicated WireGuard tunnel between a local container (client) and the remote container running on the Gateway through which Reverse Proxy traffic is routed. A link is comprised of 2 pieces, the local or client link and the gateway or remote link.
 
 ## Dependencies
 - A custom apex domain for example **mydomain.com** 
-- Publicly accessible host (Gateway) with open tcp ports 80/443 and udp port range `/proc/sys/net/ipv4/ip_local_port_range`
-- SSH access to Gateway (SSH is used for configuration, see `gateway/scripts/create-link.sh`
-- Docker (required on Gateway, optional for client)
-- Docker Compose (optional)
+- A Linux host Gateway, typically a cloud VPS (Hetzner, Digital Ocean, etc) with open ports 80/443 (http(s)) and udp port range `/proc/sys/net/ipv4/ip_local_port_range` exposed to the world
+- SSH is used for link provisioning, see `gateway/scripts/create-link.sh`
+- Docker and Docker Compose 
 
 ## Get started
 
-**Point \*.mydomain.com (DNS A Record) to the IPv4 address of your Gateway host.**
+**Point \*.mydomain.com (DNS A Record) to the IPv4 & IPv6 address of your VPS Gateway host.**
 
-1. Launch the Fractal Gateway service (nginx) (on Cloud VPS)
+1. Launch the Fractal Gateway service (nginx) (on Gateway)
 ```
 $ make setup
 $ make gateway
 ```
 
-A link is a dedicated WireGuard tunnel that has host name routed and SNI routed traffic to port 8080 and 8433 of the Caddy based `fractalnetworks/gateway-client:latest` container
 
-SSH is used to communicate with the Gateway to create links.
-
-2. From the machine you would like to expose to the public Internet, run the following command to generate a Docker Compose snippet that will expose the hypothetical Docker Compose service `nginx`, listening on port `80` to the world at `https://nginx.mydomain.com` 
+2. From the local docker service you would like to expose to the public Internet, run the following command to generate a docker compose snippet that will expose the docker compose service `nginx`, listening on internal port `80` to the world at `https://nginx.mydomain.com` 
 
 ```
 $ make docker
@@ -71,7 +77,7 @@ $ make link GATEWAY=root@gateway.mydomain.com FQDN=nginx.mydomain.com EXPOSE=ngi
       - NET_ADMIN
 ```
 
-3. Adding the generated snippet to sample nginx `docker-compose.yml` file we get:
+3. Adding the generated snippet to your `docker-compose.yml` file we get:
 ```
 version: '3.9'
 services:
@@ -89,14 +95,14 @@ services:
       - NET_ADMIN
 ```
 
-Notice it is **NOT necessary** to specify the following in the above docker-compose file:
+If you would still like to access service from your local network you will need to expose ports on your Docker host as you would traditionally, but this is no longer necessary:
 ```
 ports:
  - 80:80
  - 443:443
 ```
 
-All traffic to the local container is routed through the RPoVPN Gateway.
+Traffic from the public Internet will be routed through the RPoVPN Selfhosted Gateway.
 
 4. Run `docker-compose up -d` and see that your local nginx container is accessible to the world with a valid TLS certificate (via Caddy Automatic HTTPS) at https://nginx.mydomain.com
 

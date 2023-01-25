@@ -2,7 +2,7 @@ FROM alpine:latest
 
 ARG RELEASE_TAG
 
-RUN apk add gettext wireguard-tools caddy
+RUN apk add gettext wireguard-tools caddy socat
 
 COPY client-entrypoint.sh /usr/bin/client-entrypoint.sh
 

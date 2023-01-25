@@ -100,6 +100,38 @@ All traffic to the local container is routed through the RPoVPN Gateway.
 
 4. Run `docker-compose up -d` and see that your local nginx container is accessible to the world with a valid TLS certificate (via Caddy Automatic HTTPS) at https://nginx.mydomain.com
 
+## Split DNS without SSL Termination
+
+In the event you already have a reverse proxy which performs SSL termination for your apps/services you can enable `FORWARD_ONLY` mode. Suppose you are using Traefik for SSL termination:
+
+1. On your local LAN you will resolve \*.sub.mydomain.com to your local Traefik IP
+2. On your external DNS for your domain you will resolve \*.sub.mydomain.com to the IP of your VPS
+3. In your compose file add an additional two variables: `EXPOSE_HTTPS` and `FORWARD_ONLY`
+
+```yaml
+version: '3.9'
+services:
+  app:
+    image: traefik:latest
+  link:
+    image: fractalnetworks/gateway-client:latest
+    environment:
+      LINK_DOMAIN: sub.mydomain.com
+      EXPOSE: app:80
+      EXPOSE_HTTPS: app:443
+      FORWARD_ONLY: "True"
+      GATEWAY_CLIENT_WG_PRIVKEY: 4M7Ap0euzTxq7gTA/WIYIt3nU+i2FvHUc9eYTFQ2CGI=
+      GATEWAY_LINK_WG_PUBKEY: Wipd6Pv7ttmII4/Oj82I5tmGZwuw6ucsE3G+hwsMR08=
+      GATEWAY_ENDPOINT: 5.161.127.102:49185
+    cap_add:
+      - NET_ADMIN
+```
+You will see logs from the link container indicating it is in forward only mode:
+```
+traefikv2_link.1.qvijxtwiu0wb@docker01    | + socat TCP4-LISTEN:8443,fork,reuseaddr TCP4:app:443,reuseaddr
+traefikv2_link.1.qvijxtwiu0wb@docker01    | + socat TCP4-LISTEN:8080,fork,reuseaddr TCP4:app:80,reuseaddr
+```
+
 ## Show all links running on a Gateway
 ```
 $ docker ps

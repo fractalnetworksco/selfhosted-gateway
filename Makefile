@@ -1,10 +1,10 @@
 .PHONY: docker link setup gateway
 
 docker:
-	docker build -t fractalnetworks/selfhosted-gateway:latest -f ./gateway/Dockerfile.gateway gateway/
-	docker build -t fractalnetworks/gateway-link:latest -f ./gateway/Dockerfile.gateway-link gateway/
-	docker build -t fractalnetworks/gateway-client:latest -f ./gateway/Dockerfile.gateway-client gateway/
-	docker build -t fractalnetworks/gateway-cli:latest -f ./gateway/Dockerfile gateway/
+	docker build -t fractalnetworks/selfhosted-gateway:latest ./src/gateway/
+	docker build -t fractalnetworks/gateway-link:latest ./src/gateway-link/
+	docker build -t fractalnetworks/gateway-client:latest ./src/client-link/
+	docker build -t fractalnetworks/gateway-cli:latest ./src/create-link/
 
 setup:
 	docker network create gateway

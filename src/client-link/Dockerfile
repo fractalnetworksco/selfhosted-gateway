@@ -4,7 +4,7 @@ ARG RELEASE_TAG
 
 RUN apk add gettext wireguard-tools caddy socat
 
-COPY client-entrypoint.sh /usr/bin/client-entrypoint.sh
+COPY entrypoint.sh /usr/bin/entrypoint.sh
 
 COPY Caddyfile.template /etc/Caddyfile.template
 

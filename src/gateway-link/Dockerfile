@@ -2,7 +2,7 @@ FROM alpine:latest
 
 ARG RELEASE_TAG
 
-ADD link-entrypoint.sh /usr/bin/link-entrypoint.sh
+ADD entrypoint.sh /usr/bin/entrypoint.sh
 
 RUN apk add iptables socat wireguard-tools
 

@@ -9,4 +9,4 @@ RUN apk add iptables socat wireguard-tools
 ENV NOTEWORTHY_ENV $RELEASE_TAG
 ENV LINK_MTU=1380
 
-ENTRYPOINT [ "link-entrypoint.sh" ]
+ENTRYPOINT [ "entrypoint.sh" ]

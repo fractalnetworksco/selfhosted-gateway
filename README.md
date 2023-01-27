@@ -82,6 +82,23 @@ You may repeat steps 3-5 for as many services as you would like to expose using 
 
 ## Extra
 
+### Architecture
+
+<!-- TODO: Add a network diagram -->
+
+```shell
+├── ...
+└── src
+    ├── client-link  # WireGuard instance for the client. Also handles SSL termination with Caddy
+    │   └── ...
+    ├── create-link  # CLI script for establishing a link.
+    │   └── ...
+    ├── gateway      # NGINX reverse proxy to distribute requests to each gateway-link instance.
+    │   └── ...
+    └── gateway-link # WireGuard instance for the gateway.
+        └── ...
+```
+
 ### Terminology
 - `Link` - A dedicated WireGuard tunnel between a local container (client) and the remote container running on the Gateway through which Reverse Proxy traffic is routed. A link is comprised of 2 pieces, the local or client link and the gateway or remote link.
 

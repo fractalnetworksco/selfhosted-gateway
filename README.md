@@ -37,6 +37,7 @@ This project automates the provisioning of a **Reverse Proxy-over-VPN (RPoVPN)**
 2. Connect to the `gateway` via SSH and setup the `gateway` service:
 ```console
 foo@gateway:~$ git clone ... && cd selfhosted-gateway
+foo@gateway:~/selfhosted-gateway$ make docker
 foo@gateway:~/selfhosted-gateway$ make setup
 foo@gateway:~/selfhosted-gateway$ make gateway
 ```

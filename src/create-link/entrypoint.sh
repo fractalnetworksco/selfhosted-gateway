@@ -12,7 +12,7 @@ export WG_PRIVKEY=$(wg genkey)
 # NOTE: All traffic for `*.subdomain.domain.tld`` will be routed to the container named `subdomain-domain-tld``
 # Also supports `subdomain.domain.tld` as well as apex `domain.tld`
 # *.domain.tld should resolve to the Gateway's public IPv4 address
-export CONTAINER_NAME=$(echo $LINK_DOMAIN|python3 -c 'fqdn=input();print("-".join(fqdn.split(".")[-3:]))')
+export CONTAINER_NAME=$(echo $LINK_DOMAIN|python3 -c 'fqdn=input();print("-".join(fqdn.split(".")[-4:]))')
 
 
 LINK_CLIENT_WG_PUBKEY=$(echo $WG_PRIVKEY|wg pubkey)

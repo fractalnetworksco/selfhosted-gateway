@@ -17,6 +17,31 @@ wg set link0 peer $GATEWAY_LINK_WG_PUBKEY allowed-ips 10.0.0.1/32 persistent-kee
 if [ -z ${FORWARD_ONLY+x} ]
 then
     echo "Using caddy with SSL termination to forward traffic to app."
+    if [ "${INSECURE+set}" = set ];
+    then
+        export EXPOSE=$(cat <<-END
+$EXPOSE {
+         transport http {
+            tls
+            tls_insecure_skip_verify
+            read_buffer 8192
+         }
+       }
+END
+)
+
+    else
+        export EXPOSE=$(cat <<-END
+$EXPOSE {
+         transport http {
+            tls
+            read_buffer 8192
+         }
+       }
+END
+)
+    fi
+
     envsubst < /etc/Caddyfile.template > /etc/Caddyfile
     caddy run --config /etc/Caddyfile
 else

@@ -14,12 +14,14 @@ ip link set link0 mtu $LINK_MTU
 
 wg set link0 peer $GATEWAY_LINK_WG_PUBKEY allowed-ips 10.0.0.1/32 persistent-keepalive 30 endpoint $GATEWAY_ENDPOINT
 
-if [ -z ${FORWARD_ONLY+x} ]
-then
+if [ -z ${FORWARD_ONLY+x} ]; then
+
     echo "Using caddy with SSL termination to forward traffic to app."
-    if [ "${INSECURE+set}" = set ];
-    then
-        export EXPOSE=$(cat <<-END
+    if [ ! -z ${IN_SECURE_TLS+x} ]; then
+        echo "Configure Caddy for use with TLS backend (Insecure $IN_SECURE_TLS)"
+        if [ "$IN_SECURE_TLS" = true ]; then
+
+            export EXPOSE=$(cat <<-END
 $EXPOSE {
          transport http {
             tls
@@ -30,8 +32,8 @@ $EXPOSE {
 END
 )
 
-    else
-        export EXPOSE=$(cat <<-END
+        else
+            export EXPOSE=$(cat <<-END
 $EXPOSE {
          transport http {
             tls
@@ -40,8 +42,8 @@ $EXPOSE {
        }
 END
 )
+        fi
     fi
-
     envsubst < /etc/Caddyfile.template > /etc/Caddyfile
     caddy run --config /etc/Caddyfile
 else

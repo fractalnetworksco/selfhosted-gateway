@@ -135,6 +135,33 @@ traefikv2_link.1.qvijxtwiu0wb@docker01    | + socat TCP4-LISTEN:8443,fork,reusea
 traefikv2_link.1.qvijxtwiu0wb@docker01    | + socat TCP4-LISTEN:8080,fork,reuseaddr TCP4:app:80,reuseaddr
 ```
 
+### TLS Backend
+
+If the backend container already has a TLS certification, the connection between Caddy and the backend container can be switched to TLS/HTTPS with the `CADDY_TLS_PROXY` parameter.
+In case the certificate is self-signed, the addition `CADDY_TLS_INSECURE` can be used to deactivate the certificate check.
+
+This will continue to create a certificate for the backend via Let's Encrypt.
+
+```yaml
+version: '3.9'
+services:
+  app:
+    image: traefik:latest
+  link:
+    image: fractalnetworks/gateway-client:latest
+    environment:
+      LINK_DOMAIN: sub.mydomain.com
+      EXPOSE:  https://app:80
+      CADDY_TLS_PROXY: true
+      # Optional
+      # CADDY_TLS_INSECURE: true
+      GATEWAY_CLIENT_WG_PRIVKEY: 4M7Ap0euzTxq7gTA/WIYIt3nU+i2FvHUc9eYTFQ2CGI=
+      GATEWAY_LINK_WG_PUBKEY: Wipd6Pv7ttmII4/Oj82I5tmGZwuw6ucsE3G+hwsMR08=
+      GATEWAY_ENDPOINT: 5.161.127.102:49185
+    cap_add:
+      - NET_ADMIN
+```
+
 ### Show all links running on a Gateway
 ```
 $ docker ps

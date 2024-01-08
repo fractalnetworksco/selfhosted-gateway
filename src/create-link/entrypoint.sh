@@ -6,7 +6,6 @@ set -e
 SSH_HOST=$1
 export LINK_DOMAIN=$2
 export EXPOSE=$3
-export INSECURE=$4
 export WG_PRIVKEY=$(wg genkey)
 # Nginx uses Docker DNS resolver for dynamic mapping of LINK_DOMAIN to link container hostnames, see nginx/*.conf
 # This is the magic.
@@ -24,18 +23,6 @@ RESULT=($LINK_ENV)
 
 export GATEWAY_LINK_WG_PUBKEY=${RESULT[0]}
 export GATEWAY_ENDPOINT=${RESULT[1]}
-
-if [ ! -z "$INSECURE" ];
-then
-    if [ $(echo $INSECURE | tr '[:upper:]' '[:lower:]') = "true" ];
-    then
-export EXPOSE=$(cat <<-END
-$EXPOSE
-      INSECURE: "true"
-END
-)
-    fi
-fi
 
 cat link-compose-snippet.yml | envsubst
 

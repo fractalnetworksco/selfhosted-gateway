@@ -1,5 +1,11 @@
 # Self-hosted Gateway
 
+## Video Overview & Setup Guide
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=VCH8-XOikQc" target="_blank">
+ <img src="http://img.youtube.com/vi/VCH8-XOikQc/0.jpg" alt="Watch the video" width="560" height="315" border="10" />
+</a>
+
+
 **Jump to [Getting Started](#getting-started)**
 
 This project automates the provisioning of a **Reverse Proxy-over-VPN (RPoVPN)** using WireGuard, Caddy and NGINX. It provides a self-hosted alternative to Cloudflare Tunnels, Tailscale Funnel or ngrok and is suitable for exposing services defined in a `docker-compose` file. There's no code or APIs, just a generic NGINX config and a short bash script. It automatically provisions TLS certs with Caddy's Automatic HTTPS feature via Let's Encrypt.

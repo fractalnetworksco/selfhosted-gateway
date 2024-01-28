@@ -1,7 +1,13 @@
 #!/bin/sh
 
-WG_PRIVKEY=$(wg genkey)
-echo $WG_PRIVKEY > /etc/wireguard/link0.key
+KEY_PATH="/etc/wireguard/link0.key"
+
+if [ ! -f "$KEY_PATH" ]; then
+    WG_PRIVKEY=$(wg genkey)
+    echo $WG_PRIVKEY > "$KEY_PATH"
+else
+    echo "A WireGuard private key already exists at $KEY_PATH."
+fi
 
 
 ip link add link0 type wireguard

@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - '**' # This will run the workflow on every push to any branch
+
+jobs:
+  # build_and_test:
+  #   runs-on: ubuntu-latest
+
+    steps:
+    - name: Build images
+      run: make docker
+
+    - name: Create gateway network
+      run: make setup
+
+    - name: Launch Gateway
+      run: make gateway
+
+    - name: Create link on gateway
+      run: make link GATEWAY=localhost FQDN=app.localhost EXPOSE=3000
+
+  pypi-publish:
+    if: github.ref == 'refs/heads/run-tests' # FIXME
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2

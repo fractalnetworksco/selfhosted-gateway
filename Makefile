@@ -22,4 +22,4 @@ ci-ssh-key:
 	ssh-keygen -t ed25519 -f ./ci/gateway-sim-key -N ""
 
 link-ci:
-	./ci/create-link.sh $(GATEWAY) $(FQDN) $(EXPOSE)
+	./ci/create-link-ci.sh $(GATEWAY) $(FQDN) $(EXPOSE)

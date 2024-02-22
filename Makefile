@@ -18,8 +18,5 @@ link:
 link-macos:
 	docker run -v /run/host-services/ssh-auth.sock:/run/host-services/ssh-auth.sock -e SSH_AUTH_SOCK="/run/host-services/ssh-auth.sock" --rm -it fractalnetworks/gateway-cli:latest $(GATEWAY) $(FQDN) $(EXPOSE)
 
-ci-ssh-key:
-	ssh-keygen -t ed25519 -f ./ci/gateway-sim-key -N ""
-
 link-ci:
 	./ci/create-link-ci.sh $(GATEWAY) $(FQDN) $(EXPOSE)

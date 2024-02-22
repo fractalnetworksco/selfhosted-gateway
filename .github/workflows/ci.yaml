@@ -22,10 +22,7 @@ jobs:
     - name: Generate ssh key for CI gateway-sshd
       run: make ci-ssh-key
 
-    - name: Launch Gateway
-      run: cd ci/ && docker-compose up -d
-
-    - name: Create link on gateway
+    - name: Launch gateway and create link on gateway
       run: make link-ci GATEWAY=gateway-sshd FQDN=app.example.com EXPOSE=app:3000
 
     #- name: Ensure link works by making request to app.example.com

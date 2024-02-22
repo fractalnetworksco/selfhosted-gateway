@@ -16,14 +16,12 @@ jobs:
     - name: Build images
       run: make docker
 
-    - name: Create gateway network
-      run: make setup
-
-    - name: Generate ssh key for CI gateway-sshd
-      run: make ci-ssh-key
-
     - name: Launch gateway and create link on gateway
       run: make link-ci GATEWAY=gateway-sshd FQDN=app.example.com EXPOSE=app:3000
 
     #- name: Ensure link works by making request to app.example.com
     #  run: curl --resolve app.example.com:443:127.0.0.1 http://app.example.com:443
+
+
+    - name: Cleanup
+      run: docker compose -f ./ci/docker-compose.yaml down

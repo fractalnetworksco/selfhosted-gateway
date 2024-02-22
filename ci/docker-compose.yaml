@@ -1,7 +1,7 @@
 version: '3.9'
 services:
     gateway-sshd:
-        image: fractalnetworks/gateway-sim:latest
+        build: .
         ports:
             - 2222:22
         volumes:

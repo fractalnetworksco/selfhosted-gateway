@@ -22,4 +22,4 @@ ci-ssh-key:
 	ssh-keygen -t ed25519 -f ./ci/gateway-sim-key -N ""
 
 link-ci:
-	docker run --network gateway -e SSH_AGENT_PID=$$SSH_AGENT_PID -e SSH_AUTH_SOCK=$$SSH_AUTH_SOCK -v $$SSH_AUTH_SOCK:$$SSH_AUTH_SOCK --rm fractalnetworks/gateway-cli:latest $(GATEWAY) $(FQDN) $(EXPOSE)
+	./ci/create-link.sh $(GATEWAY) $(FQDN) $(EXPOSE)

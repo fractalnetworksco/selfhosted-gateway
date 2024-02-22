@@ -4,6 +4,15 @@
 set -e
 
 SSH_HOST=$1
+SSH_PORT=22
+# split port from SSH_HOST if SSH_HOST contains :
+if [[ $SSH_HOST == *":"* ]]; then
+  IFS=':' read -ra ADDR <<< "$SSH_HOST"
+  SSH_HOST=${ADDR[0]}
+  SSH_PORT=${ADDR[1]}
+fi
+echo $SSH_HOST
+echo $SSH_PORT
 export LINK_DOMAIN=$2
 export EXPOSE=$3
 export WG_PRIVKEY=$(wg genkey)
@@ -16,7 +25,7 @@ export CONTAINER_NAME=$(echo $LINK_DOMAIN|python3 -c 'fqdn=input();print("-".joi
 
 
 LINK_CLIENT_WG_PUBKEY=$(echo $WG_PRIVKEY|wg pubkey)
-LINK_ENV=$(ssh $SSH_HOST "bash -s" -- < ./remote.sh $CONTAINER_NAME $LINK_CLIENT_WG_PUBKEY)
+LINK_ENV=$(ssh -o StrictHostKeyChecking=accept-new $SSH_HOST -p $SSH_PORT "bash -s" -- < ./remote.sh $CONTAINER_NAME $LINK_CLIENT_WG_PUBKEY)
 
 # convert to array
 RESULT=($LINK_ENV)

@@ -1,10 +1,11 @@
 #!/bin/bash
 set -e
+set -x
 
 cd ci/
 ssh-keygen -t ed25519 -f ./gateway-sim-key -N ""
-# create docker network if not exists
-docker network create gateway || true
+
+docker network create gateway || true   # create docker network if not exists
 docker compose up -d --build
 eval $(ssh-agent -s)
 ssh-add ./gateway-sim-key

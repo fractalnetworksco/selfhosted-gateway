@@ -1,0 +1,8 @@
+version: '3.9'
+
+# need this
+networks:
+  gateway:
+      external: true
+
+services:  

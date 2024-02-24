@@ -44,8 +44,23 @@ END
 )
         fi
     fi
-    envsubst < /etc/Caddyfile.template > /etc/Caddyfile
-    caddy run --config /etc/Caddyfile
+
+    CADDYFILE='/etc/Caddyfile'
+    BASIC_AUTH=${BASIC_AUTH:-}
+    # Check if BASIC_AUTH is set and not empty
+    if [[ ! -z "${BASIC_AUTH}" ]]; then
+    # Assuming BASIC_AUTH contains username:hashed_password
+    # Assuming BASIC_AUTH contains username:hashed_password
+    USERNAME=$(echo $BASIC_AUTH | cut -d':' -f1)
+    PASSWORD=$(echo $BASIC_AUTH | cut -d':' -f2)
+    HASHED_PASSWORD=$(caddy hash-password --plaintext $PASSWORD)
+    # Construct the basic auth configuration
+    BASIC_AUTH_CONFIG="    basicauth /* {\n        $USERNAME $HASHED_PASSWORD\n    }\n"
+    # Insert basic auth config into the final Caddyfile, replacing the placeholder
+    sed -i "s|# BasicAuthPlaceholder|$BASIC_AUTH_CONFIG|" /etc/Caddyfile.template
+fi
+    envsubst < /etc/Caddyfile.template > $CADDYFILE
+    caddy run --config $CADDYFILE
 else
     echo "Caddy is disabled. Using socat to forward traffic to app."
     socat TCP4-LISTEN:8080,fork,reuseaddr TCP4:$EXPOSE,reuseaddr &

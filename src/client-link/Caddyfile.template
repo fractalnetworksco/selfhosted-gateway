@@ -8,5 +8,7 @@ $LINK_DOMAIN {
 	    respond "OK" 200
 	}
 
+    # BasicAuthPlaceholder
+
     reverse_proxy $EXPOSE
 }

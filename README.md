@@ -1,4 +1,13 @@
 # Self-hosted Gateway
+**Jump to [Getting Started](#getting-started)**
+## Features and Benefits
+- Docker native self-hosted alternative to Cloudflare Tunnels, Tailscale Funnel, ngrok and others.
+- Entirely self-hosted and self-managed, both local and remote components tunneling components provided.
+- No custom code, this project leverages existing battled tested FOSS components:
+ - WireGuard
+ - Nginx (Gateway)
+ - Caddy (Client)
+- Automatic client side HTTPS cert provisioning thanks to Caddy's automatic https.
 
 ## Video Overview & Setup Guide
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=VCH8-XOikQc" target="_blank">
@@ -6,11 +15,11 @@
 </a>
 
 
-**Jump to [Getting Started](#getting-started)**
+## Overview
 
-This project automates the provisioning of a **Reverse Proxy-over-VPN (RPoVPN)** using WireGuard, Caddy and NGINX. It provides a self-hosted alternative to Cloudflare Tunnels, Tailscale Funnel or ngrok and is suitable for exposing services defined in a `docker-compose` file. There's no code or APIs, just a generic NGINX config and a short bash script. It automatically provisions TLS certs with Caddy's Automatic HTTPS feature via Let's Encrypt.
+This project automates the provisioning of **Reverse Proxy-over-VPN (RPoVPN)** WireGuard tunnels with Caddy and NGINX. It is particularly well suited for exposing docker compose services defined in a `docker-compose` file to the public Internet. There's no code or APIs, just an ultra generic NGINX config and some short provisioning bash script. TLS certs are provisioned automatically with Caddy's Automatic HTTPS feature via Let's Encrypt or ZeroSSL.
 
-## Benefits
+## Use cases
 
 1. **RPoVPN is a common strategy for remotely accessing applications self-hosted at home. It solves problems such as:**
   - Self-hosting behind double-NAT or via an ISP that does CGNAT (Starlink, Mobile Internet).
@@ -18,26 +27,26 @@ This project automates the provisioning of a **Reverse Proxy-over-VPN (RPoVPN)**
   - Having a dynamically allocated IP that may change frequently.
 
 2. **Using RPoVPN is ideal for self-hosting from both a network security and privacy perspective:**
-  - Prevents the need to expose your home public IP address to the world.
-  - Utilises the advanced network isolation capabilities of Docker (via Linux network namespaces) to isolate your self-hosted services from your home network and your other docker self-hosted services.
+  - Obviates the need for a static IP or expose your home's public IP address to the world.
+  - Utilizes advanced network isolation capabilities of Docker (thanks to Linux network namespaces) in order to isolate locally exposed services from your home network and other local docker services.
   - Built on open-source technologies (WireGuard, Caddy and NGINX).
 
 ## Getting Started
 
 ### Prerequisites
-
-- Ability to create an `A` record for a domain name.
-- A Linux host to act as the `gateway`, typically a cloud VPS (Hetzner, Digital Ocean, etc..) with the following requirements:
-  - Open ports 80/443 (http(s)).
-  - UDP port range listed `/proc/sys/net/ipv4/ip_local_port_range` exposed to the internet.
-  - SSH access to the `gateway`.
-  - `docker`, `git` & `make` installed.
-- Server with one or more services defined in a `docker-compose.yml` that you would like to expose to the internet.
-- A local machine to run the commands on. This may also be the server where the exposed services will run.
-  - `docker`, `git` & `make` installed on the local machine.
+- Domain
+ - Ability to create an `A` record for a domain name.
+- Gateway 
+ - A publically addressable Linux host to act as the `gateway`, typically a cloud VPS (Hetzner, Digital Ocean, etc..) with the following requirements:
+ - SSH access
+ - Ports 80/443 open (http/https)
+ - The UDP port range listed by `cat /proc/sys/net/ipv4/ip_local_port_range` open to the Internet.
+ - `docker`, `git` & `make` installed on the Gateway
+- Client
+ - An existing `docker-compose.yml` that you would like to expose to the Internet.
+ - `docker`, `git` & `make` installed locally
 
 ### Steps
-
 1. Point `*.mydomain.com` (DNS A Record) to the IPv4 & IPv6 address of your VPS Gateway host.
 
 2. Connect to the `gateway` via SSH and setup the `gateway` service:
@@ -48,7 +57,7 @@ foo@gateway:~/selfhosted-gateway$ make setup
 foo@gateway:~/selfhosted-gateway$ make gateway
 ```
 
-3. On your local machine, generate a `link` and the required `docker-compose.yml` snippet:
+3. To generate a `link` docker compose snippet run the following commands:
 ```console
 foo@local:~$ git clone ... && cd selfhosted-gateway
 foo@local:~/selfhosted-gateway$ make docker
@@ -83,9 +92,11 @@ services:
       - NET_ADMIN
 ```
 
-5. Run `docker compose up -d`. This will established the `link` to the `gateway` and negotiate a TLS-certificate via Let's Encrypt. After ~1 minute, your service should be securely accessible via `https://nginx.mydomain.com/`
+5. Start your docker compose project as you would normally (`docker compose up -d`)
+6. 
+7. This will established the `link` to the `gateway` and automatically provision a TLS-certificate
 
-You may repeat steps 3-5 for as many services as you would like to expose using the same gateway.
+**You may repeat steps 3-5 for as many services as you would like to expose using the same gateway**
 
 ## Extra
 

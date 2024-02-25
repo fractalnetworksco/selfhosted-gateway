@@ -3,6 +3,21 @@
 
 set -e
 
+function fqdn_to_container_name() {
+    local fqdn="$1"
+
+    # Check if the FQDN is non-empty
+    if [[ -z "$fqdn" ]]; then
+        echo "Error: No FQDN provided."
+        return 1
+    fi
+
+    # Replace all dots with dashes
+    CONTAINER_NAME="${fqdn//./-}"
+
+    echo "$CONTAINER_NAME"
+}
+
 SSH_HOST=$1
 SSH_PORT=22
 # split port from SSH_HOST if SSH_HOST contains :
@@ -14,13 +29,15 @@ fi
 
 export LINK_DOMAIN=$2
 export EXPOSE=$3
-export WG_PRIVKEY=$(wg genkey)
+WG_PRIVKEY=$(wg genkey)
+export WG_PRIVKEY
 # Nginx uses Docker DNS resolver for dynamic mapping of LINK_DOMAIN to link container hostnames, see nginx/*.conf
 # This is the magic.
 # NOTE: All traffic for `*.subdomain.domain.tld`` will be routed to the container named `subdomain-domain-tld``
 # Also supports `subdomain.domain.tld` as well as apex `domain.tld`
 # *.domain.tld should resolve to the Gateway's public IPv4 address
-export CONTAINER_NAME=$(echo $LINK_DOMAIN|python3 -c 'fqdn=input();print("-".join(fqdn.split(".")[-4:]))')
+CONTAINER_NAME=$(fqdn_to_container_name "$LINK_DOMAIN")
+export CONTAINER_NAME
 
 
 LINK_CLIENT_WG_PUBKEY=$(echo $WG_PRIVKEY|wg pubkey)

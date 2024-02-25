@@ -55,7 +55,7 @@ END
     PASSWORD=$(echo $BASIC_AUTH | cut -d':' -f2)
     HASHED_PASSWORD=$(caddy hash-password --plaintext $PASSWORD)
     # Construct the basic auth configuration
-    BASIC_AUTH_CONFIG="    basicauth /* {\n        $USERNAME $HASHED_PASSWORD\n    }\n"
+    BASIC_AUTH_CONFIG="    basicauth /* {\n        "$USERNAME" "$HASHED_PASSWORD"\n    }\n"
     # Insert basic auth config into the final Caddyfile, replacing the placeholder
     sed -i "s|# BasicAuthPlaceholder|$BASIC_AUTH_CONFIG|" /etc/Caddyfile.template
 fi

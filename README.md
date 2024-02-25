@@ -4,9 +4,9 @@
 - Docker native self-hosted alternative to Cloudflare Tunnels, Tailscale Funnel, ngrok and others.
 - Entirely self-hosted and self-managed, both local and remote components tunneling components provided.
 - No custom code, this project leverages existing battled tested FOSS components:
- - WireGuard
- - Nginx (Gateway)
- - Caddy (Client)
+  - WireGuard
+  - Nginx (Gateway)
+  - Caddy (Client)
 - Automatic client side HTTPS cert provisioning thanks to Caddy's automatic https.
 - Remote client IPs passed to local container via proxy protocol
 - Enable basic authentication by specifying env variable containig username and password
@@ -38,16 +38,16 @@ This project automates the provisioning of **Reverse Proxy-over-VPN (RPoVPN)** W
 
 ### Prerequisites
 - Domain
- - Ability to create an `A` record for a domain name.
+  - Ability to create an `A` record for a domain name.
 - Gateway 
- - A publically addressable Linux host to act as the `gateway`, typically a cloud VPS (Hetzner, Digital Ocean, etc..) with the following requirements:
- - SSH access
- - Ports 80/443 open (http/https)
- - The UDP port range listed by `cat /proc/sys/net/ipv4/ip_local_port_range` open to the Internet.
- - `docker`, `git` & `make` installed on the Gateway
+  - A publically addressable Linux host to act as the `gateway`, typically a cloud VPS (Hetzner, Digital Ocean, etc..) with the following requirements:
+  - SSH access
+  - Ports 80/443 open (http/https)
+  - The UDP port range listed by `cat /proc/sys/net/ipv4/ip_local_port_range` open to the Internet.
+  - `docker`, `git` & `make` installed on the Gateway
 - Client
- - An existing `docker-compose.yml` that you would like to expose to the Internet.
- - `docker`, `git` & `make` installed locally
+  - An existing `docker-compose.yml` that you would like to expose to the Internet.
+  - `docker`, `git` & `make` installed locally
 
 ### Steps
 1. Point `*.mydomain.com` (DNS A Record) to the IPv4 & IPv6 address of your VPS Gateway host.

@@ -8,6 +8,9 @@
  - Nginx (Gateway)
  - Caddy (Client)
 - Automatic client side HTTPS cert provisioning thanks to Caddy's automatic https.
+- Remote client IPs passed to local container via proxy protocol
+- Enable basic authentication by specifying env variable containig username and password
+- Proxy generic TCP/UDP traffic to localhost with socat
 
 ## Video Overview & Setup Guide
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=VCH8-XOikQc" target="_blank">

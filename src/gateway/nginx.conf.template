@@ -35,7 +35,7 @@ events {
             ~^(?<subdomain>.+?)?\.(?<domain>.+)\.(?<tld>.+)$ $subdomain-$domain-$tld:443;
             ~^(?<domain>.+)\.(?<tld>.+)$ $domain-$tld:443;
         } 
-
+        proxy_protocol on;
         server {
             listen 443; 
                 
@@ -46,6 +46,4 @@ events {
             proxy_pass $targetBackend;       
             ssl_preread on;
         }
-
-
 }

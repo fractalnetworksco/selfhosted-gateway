@@ -1,6 +1,12 @@
 {
     http_port 8080
     https_port 8443
+    servers {
+        listener_wrappers {
+            proxy_protocol
+            tls
+        }
+    }
 }
 
 $LINK_DOMAIN {
@@ -11,4 +17,7 @@ $LINK_DOMAIN {
     # BasicAuthPlaceholder
 
     reverse_proxy $EXPOSE
+
+    # TODO optional internal tls
+    # tls internal
 }

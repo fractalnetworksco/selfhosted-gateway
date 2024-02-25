@@ -15,7 +15,7 @@ function fqdn_to_container_name() {
     # Replace all dots with dashes
     CONTAINER_NAME="${fqdn//./-}"
 
-    echo "$CONTAINER_NAME"
+    echo ""
 }
 
 SSH_HOST=$1

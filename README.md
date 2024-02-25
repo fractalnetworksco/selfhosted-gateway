@@ -2,7 +2,7 @@
 **Jump to [Getting Started](#getting-started)**
 ## Features and Benefits
 - Docker native self-hosted alternative to Cloudflare Tunnels, Tailscale Funnel, ngrok and others.
-- Entirely self-hosted and self-managed, both local and remote components tunneling components provided.
+- Entirely self-hosted and self-managed, includes local and remote tunneling components.
 - No custom code, this project leverages existing battled tested FOSS components:
   - WireGuard
   - Nginx (Gateway)

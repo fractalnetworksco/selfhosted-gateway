@@ -5,3 +5,7 @@ networks:
       external: true
 
 services:
+  nginx:
+    image: nginx:latest
+    networks:
+      - gateway

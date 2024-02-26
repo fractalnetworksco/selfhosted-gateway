@@ -14,10 +14,12 @@ $LINK_DOMAIN {
 	    respond "OK" 200
 	}
 
-    # BasicAuthPlaceholder
+    # optional basic authentication
+    $BASIC_AUTH_CONFIG
+
+    # optional internal tls
+    $TLS_INTERNAL_CONFIG
 
     reverse_proxy $EXPOSE
 
-    # TODO optional internal tls
-    # tls internal
 }

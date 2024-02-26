@@ -47,17 +47,29 @@ END
 
     CADDYFILE='/etc/Caddyfile'
     BASIC_AUTH=${BASIC_AUTH:-}
+    BASIC_AUTH_CONFIG=${BASIC_AUTH_CONFIG:-}
+    TLS_INTERNAL_CONFIG=${TLS_INTERNAL_CONFIG:-}
     # Check if BASIC_AUTH is set and not empty
     if [[ ! -z "${BASIC_AUTH}" ]]; then
     # Assuming BASIC_AUTH contains username:hashed_password
     # Assuming BASIC_AUTH contains username:hashed_password
-    USERNAME=$(echo $BASIC_AUTH | cut -d':' -f1)
-    PASSWORD=$(echo $BASIC_AUTH | cut -d':' -f2)
+    USERNAME=$(echo "$BASIC_AUTH" | cut -d':' -f1)
+    PASSWORD=$(echo "$BASIC_AUTH" | cut -d':' -f2)
     HASHED_PASSWORD=$(caddy hash-password --plaintext $PASSWORD)
     # Construct the basic auth configuration
-    BASIC_AUTH_CONFIG="    basicauth /* {\n        "$USERNAME" "$HASHED_PASSWORD"\n    }\n"
-    # Insert basic auth config into the final Caddyfile, replacing the placeholder
-    sed -i "s|# BasicAuthPlaceholder|$BASIC_AUTH_CONFIG|" /etc/Caddyfile.template
+    BASIC_AUTH_CONFIG=$(cat <<-END
+        basicauth /* {
+            ${USERNAME} ${HASHED_PASSWORD}
+        }
+END
+    )
+    export BASIC_AUTH_CONFIG
+    # if TLS_INTERNAL is set export TLS_INTERNAL_CONFIG
+    if [ ! -z ${TLS_INTERNAL+x} ]; then
+        TLS_INTERNAL_CONFIG=$(cat <<-END
+        tls internal
+END
+    )
 fi
     envsubst < /etc/Caddyfile.template > $CADDYFILE
     caddy run --config $CADDYFILE
@@ -66,4 +78,3 @@ else
     socat TCP4-LISTEN:8080,fork,reuseaddr TCP4:$EXPOSE,reuseaddr &
     socat TCP4-LISTEN:8443,fork,reuseaddr TCP4:$EXPOSE_HTTPS,reuseaddr
 fi
-

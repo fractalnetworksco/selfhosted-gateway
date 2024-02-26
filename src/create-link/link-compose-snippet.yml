@@ -6,5 +6,9 @@
       GATEWAY_CLIENT_WG_PRIVKEY: ${WG_PRIVKEY}
       GATEWAY_LINK_WG_PUBKEY: ${GATEWAY_LINK_WG_PUBKEY}
       GATEWAY_ENDPOINT: ${GATEWAY_ENDPOINT}
+      # Remove to disable basic auth
+      BASIC_AUTH: admin:admin
+      # Remove to fetch "real" tls certs instead of generating self-signed ones
+      TLS_INTERNAL: true
     cap_add:
       - NET_ADMIN

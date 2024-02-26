@@ -15,7 +15,7 @@ docker run --network gateway -e SSH_AGENT_PID=$SSH_AGENT_PID -e SSH_AUTH_SOCK=$S
 cat network.yaml >> test-link.yaml
 # set the gateway endpoint to the gateway link container
 sed -i 's/^\(\s*GATEWAY_ENDPOINT:\).*/\1 app-example-com:18521/' test-link.yaml
-docker compose -f test-link.yaml up -d
+docker compose -f test-link.yaml up
 docker compose -f test-link.yaml exec link ping 10.0.0.1 -c 2
 # assert http response code was 200
 # asserts basic auth is working with user: admin, password: admin

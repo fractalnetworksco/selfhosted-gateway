@@ -72,6 +72,7 @@ END
 END
     )
     fi
+    export TLS_INTERNAL_CONFIG
     envsubst < /etc/Caddyfile.template > $CADDYFILE
     caddy run --config $CADDYFILE
 else

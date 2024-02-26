@@ -17,7 +17,18 @@ cat network.yaml >> test-link.yaml
 sed -i 's/^\(\s*GATEWAY_ENDPOINT:\).*/\1 app-example-com:18521/' test-link.yaml
 docker compose -f test-link.yaml up -d
 docker compose -f test-link.yaml exec link ping 10.0.0.1 -c 2
+# assert http response code was 200
+# asserts basic auth is working with user: admin, password: admin
 
+if ! docker compose exec gateway curl -k -H "Authorization: Basic YWRtaW46YWRtaW4=" --resolve app.example.com:443:127.0.0.1 https://app.example.com -I |grep "HTTP/2 200"; then
+    FAILED="true"
+fi
 docker compose -f test-link.yaml down
 docker rm -f app-example-com
 rm test-link.yaml
+docker compose down
+
+# if FAILED is true return 1 else 0
+if [ ! -z ${FAILED+x} ]; then
+    exit 1
+fi

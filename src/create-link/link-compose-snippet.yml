@@ -10,5 +10,10 @@
       BASIC_AUTH: admin:admin
       # Remove to fetch "real" tls certs instead of generating self-signed ones
       TLS_INTERNAL: true
+
+      # CADDY_TLS_PROXY: true
+      # CADDY_TLS_INSECURE: true
+      # FORWARD_ONLY: true
+      
     cap_add:
       - NET_ADMIN

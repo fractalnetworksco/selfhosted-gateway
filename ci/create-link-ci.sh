@@ -11,12 +11,15 @@ yes| ssh-keygen -t ed25519 -f ./gateway-sim-key -N ""
 docker compose up -d --build
 eval $(ssh-agent -s)
 ssh-add ./gateway-sim-key
+
+# Test create-link
 # generate a docker compose to test the generated link
 cat test-link.template.yaml > test-link.yaml
 docker run --network gateway -e SSH_AGENT_PID=$SSH_AGENT_PID -e SSH_AUTH_SOCK=$SSH_AUTH_SOCK -v $SSH_AUTH_SOCK:$SSH_AUTH_SOCK --rm fractalnetworks/gateway-cli:latest $1 $2 $3 >> test-link.yaml
 cat network.yaml >> test-link.yaml
 # set the gateway endpoint to the gateway link container
 sed -i 's/^\(\s*GATEWAY_ENDPOINT:\).*/\1 app-example-com:18521/' test-link.yaml
+
 docker compose -f test-link.yaml up -d
 docker compose -f test-link.yaml exec link ping 10.0.0.1 -c 2
 # assert http response code was 200
@@ -27,7 +30,28 @@ if ! docker compose exec gateway curl -k -H "Authorization: Basic YWRtaW46YWRtaW
 fi
 docker compose -f test-link.yaml down
 docker rm -f app-example-com
-rm test-link.yaml
+# rm test-link.yaml                 # not removing for now...
+
+caddy_greenlight=false               # andrew's sentinel thing
+
+if [ "$caddy_greenlight" = true ]; then
+    # Test the link using  CADDY_TLS_PROXY: true
+    testLinkFile="test-link-caddyTLS.yaml"
+
+    # generate new docker compose
+    cat test-link.template.yaml > $testLinkFile
+    docker run --network gateway -e SSH_AGENT_PID=$SSH_AGENT_PID -e SSH_AUTH_SOCK=$SSH_AUTH_SOCK -v $SSH_AUTH_SOCK:$SSH_AUTH_SOCK --rm fractalnetworks/gateway-cli:latest $1 $2 $3 >> $testLinkFile
+    cat network.yaml >> $testLinkFile
+    # set the gateway endpoint to the gateway link container
+    sed -i 's/^\(\s*GATEWAY_ENDPOINT:\).*/\1 app-example-com:18521/' $testLinkFile
+
+    docker compose -f $testLinkFile up -d
+    docker compose -f $testLinkFile exec link ping 10.0.0.1 -c 2
+
+fi
+
+
+# stop and remove gateway and sshd containers
 docker compose down
 
 # if FAILED is true return 1 else 0

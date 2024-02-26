@@ -51,18 +51,19 @@ END
     TLS_INTERNAL_CONFIG=${TLS_INTERNAL_CONFIG:-}
     # Check if BASIC_AUTH is set and not empty
     if [[ ! -z "${BASIC_AUTH}" ]]; then
-    # Assuming BASIC_AUTH contains username:hashed_password
-    # Assuming BASIC_AUTH contains username:hashed_password
-    USERNAME=$(echo "$BASIC_AUTH" | cut -d':' -f1)
-    PASSWORD=$(echo "$BASIC_AUTH" | cut -d':' -f2)
-    HASHED_PASSWORD=$(caddy hash-password --plaintext $PASSWORD)
-    # Construct the basic auth configuration
-    BASIC_AUTH_CONFIG=$(cat <<-END
-        basicauth /* {
-            ${USERNAME} ${HASHED_PASSWORD}
-        }
+        # Assuming BASIC_AUTH contains username:hashed_password
+        # Assuming BASIC_AUTH contains username:hashed_password
+        USERNAME=$(echo "$BASIC_AUTH" | cut -d':' -f1)
+        PASSWORD=$(echo "$BASIC_AUTH" | cut -d':' -f2)
+        HASHED_PASSWORD=$(caddy hash-password --plaintext $PASSWORD)
+        # Construct the basic auth configuration
+        BASIC_AUTH_CONFIG=$(cat <<-END
+            basicauth /* {
+                ${USERNAME} ${HASHED_PASSWORD}
+            }
 END
-    )
+        )
+    fi
     export BASIC_AUTH_CONFIG
     # if TLS_INTERNAL is set export TLS_INTERNAL_CONFIG
     if [ ! -z ${TLS_INTERNAL+x} ]; then
@@ -70,7 +71,7 @@ END
         tls internal
 END
     )
-fi
+    fi
     envsubst < /etc/Caddyfile.template > $CADDYFILE
     caddy run --config $CADDYFILE
 else

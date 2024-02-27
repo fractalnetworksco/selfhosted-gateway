@@ -1,0 +1,8 @@
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+HTTP/2 502 
+alt-svc: h3=":8443"; ma=2592000
+server: Caddy
+date: Tue, 27 Feb 2024 20:53:27 GMT
+

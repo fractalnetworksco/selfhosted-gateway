@@ -15,26 +15,27 @@ ssh-add ./gateway-sim-key
 
 testLinkFile=""   # Define the variable in a scope outside the cleanup function
 
+# Function to catch and cleanup containers/files if the script fails or is terminated prematurely.
+# Good for local testing, eliminates the need to manually remove docker containers.
 function cleanup {
     if [[ -n "$testLinkFile" ]]; then  # Check if the variable is non-empty
-        echo "\n******* Cleanup function: cleaning up $testLinkFile..."
+        echo "\n******* Cleanup function: \ncleaning up $testLinkFile..."
         docker compose -f "$testLinkFile" down --remove-orphans || true
         docker rm -f app-example-com || true
 
-        rm "$testLinkFile" || true        # comment out to keep the file for debugging
+        rm "$testLinkFile" || true
     fi
 }
-# Catch and cleanup stragglers if the script fails or is terminated.
-# Good for local testing, eliminates the need to manually remove docker containers.
-# trap cleanup EXIT         # commented out to keep everything for debugging
+trap cleanup EXIT
 
 
-normal_test_greenlight=false               # andrew's sentinel thing
-if [ "$normal_test_greenlight" = true ]; then
-    # Test create-link
+# Default Link test
+normal_test_proceed=true
+if [ "$normal_test_proceed" = true ]; then
+    echo "******************* Test Default Link *******************"
     $testLinkFile="test-link.yaml"
 
-    # generate a docker compose to test the generated link
+    # generate a docker compose using templates + output
     cat test-link.template.yaml > $testLinkFile
     docker run --network gateway -e SSH_AGENT_PID=$SSH_AGENT_PID -e SSH_AUTH_SOCK=$SSH_AUTH_SOCK -v $SSH_AUTH_SOCK:$SSH_AUTH_SOCK --rm fractalnetworks/gateway-cli:latest $1 $2 $3 >> $testLinkFile
     cat network.yaml >> $testLinkFile
@@ -51,23 +52,23 @@ if [ "$normal_test_greenlight" = true ]; then
     fi
 
     # cleanup
-    docker compose -f $testLinkFile down
-    docker rm -f app-example-com
-    rm $testLinkFile               # comment out to keep the file for debugging
+    cleanup
+    # docker compose -f $testLinkFile down
+    # docker rm -f app-example-com
+    # rm $testLinkFile
 else
     echo "******************* Skipping normal link test... \n(normal_test_greenlight was false)"
 fi
 
-
+# Caddy + TLS Link test
 caddy_greenlight=true               # andrew's sentinel thing
-
 if [ "$caddy_greenlight" = true ]; then
-    echo "******************* Testing Caddy TLS Proxy *******************"
+    echo "******************* Testing Caddy TLS Proxy Link *******************"
     # Test the link using  CADDY_TLS_PROXY: true
     testLinkFile="test-link-caddyTLS.yaml"
 
-    # generate new docker compose
-    cat test-link.template.yaml > $testLinkFile
+    # build new docker compose using template + output + template
+    cat test-link-caddyTLS.template.yaml > $testLinkFile
     docker run --network gateway -e SSH_AGENT_PID=$SSH_AGENT_PID -e SSH_AUTH_SOCK=$SSH_AUTH_SOCK -v $SSH_AUTH_SOCK:$SSH_AUTH_SOCK --rm fractalnetworks/gateway-cli:latest $1 $2 $3 >> $testLinkFile
     cat network.yaml >> $testLinkFile
 
@@ -81,6 +82,7 @@ if [ "$caddy_greenlight" = true ]; then
     # 3. For self-signed certificates, `CADDY_TLS_INSECURE` can be used to 
     #    deactivate the certificate check.
     sed -i 's/^\(\s*\)#\s*CADDY_TLS_INSECURE: true/\1CADDY_TLS_INSECURE: true/' $testLinkFile
+        # for #2 & #3, the comments from the template could be removed and instead appended in the "build new docker compose..." step from a template
 
     # 4. In the event you already have a reverse proxy which performs SSL termination for your 
     # apps/services you can enable FORWARD_ONLY mode. Suppose you are using Traefik for SSL 
@@ -96,15 +98,16 @@ if [ "$caddy_greenlight" = true ]; then
         FAILED="true"
     fi
 
-    #**************commented out to keep everything for debugging
+    # cleanup
+    cleanup
     # docker compose -f $testLinkFile down --remove-orphans
     # docker rm -f app-example-com
-    # rm $testLinkFile                 # comment out to keep the file for debugging
+    # rm $testLinkFile
 fi
 
 
 # stop and remove gateway and sshd containers
-# docker compose down || echo "'docker compose down' at the end had an issue"
+docker compose down || echo "'docker compose down' at end of 'create-link-ci.sh' had an issue"
 
 # if FAILED is true return 1 else 0
 if [ ! -z ${FAILED+x} ]; then

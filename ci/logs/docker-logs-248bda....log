@@ -1,0 +1,75 @@
+andrew@AndrewsPCH:~/Work/SelfHosted-Gateway/main$ docker logs 248bda
++ echo 'OIIH7ZyPZ7QnypcLv0/dUmat5Bt74IctlEw1cyjj3FA='
++ ip link add link0 type wireguard
++ wg set link0 private-key /etc/wireguard/link0.key
++ wg set link0 listen-port 18521
++ ip addr add 10.0.0.2/24 dev link0
++ ip link set link0 up
++ ip link set link0 mtu 1380
++ wg set link0 peer 'Jns+uf1vl/fgA9MiviDVQYgLJ2MPu2LETPFkMFnh2CE=' allowed-ips 10.0.0.1/32 persistent-keepalive 30 endpoint app-example-com:18521
++ '[' -z ]
++ echo 'Using caddy with SSL termination to forward traffic to app.'
++ '[' '!' -z x ]
++ echo 'Configure Caddy for use with TLS backend'
++ '[' '!' -z x ]
++ echo 'Skip TLS verification'
+Using caddy with SSL termination to forward traffic to app.
+Configure Caddy for use with TLS backend
+Skip TLS verification
++ cat
++ export 'EXPOSE=nginx:80 {
+         transport http {
+            tls
+            tls_insecure_skip_verify
+            read_buffer 8192
+         }
+       }'
++ CADDYFILE=/etc/Caddyfile
++ BASIC_AUTH=admin:admin
++ BASIC_AUTH_CONFIG=
++ TLS_INTERNAL_CONFIG=
++ '[[' '!' -z admin:admin ]]
++ echo admin:admin
++ cut -d: -f1
++ USERNAME=admin
++ echo admin:admin
++ cut -d: -f2
++ PASSWORD=admin
++ caddy hash-password --plaintext admin
++ HASHED_PASSWORD='$2a$14$tht9CvLOIE5xD006PTNcQOz7AWwEWrBLa83M4psLPElknoL5Y.lwu'
++ cat
++ BASIC_AUTH_CONFIG='            basicauth /* {
+                admin $2a$14$tht9CvLOIE5xD006PTNcQOz7AWwEWrBLa83M4psLPElknoL5Y.lwu
+            }'
++ export BASIC_AUTH_CONFIG
++ '[' '!' -z x ]
++ cat
++ TLS_INTERNAL_CONFIG='        tls internal'
++ export TLS_INTERNAL_CONFIG
++ envsubst
++ caddy run --config /etc/Caddyfile
+{"level":"info","ts":1709153034.0562196,"msg":"using provided configuration","config_file":"/etc/Caddyfile","config_adapter":""}
+{"level":"warn","ts":1709153034.05886,"msg":"Caddyfile input is not formatted; run 'caddy fmt --overwrite' to fix inconsistencies","adapter":"caddyfile","file":"/etc/Caddyfile","line":2}
+{"level":"info","ts":1709153034.0602427,"logger":"admin","msg":"admin endpoint started","address":"localhost:2019","enforce_origin":false,"origins":["//localhost:2019","//[::1]:2019","//127.0.0.1:2019"]}
+{"level":"info","ts":1709153034.0607598,"logger":"tls.cache.maintenance","msg":"started background certificate maintenance","cache":"0xc00057ff00"}
+{"level":"info","ts":1709153034.0650861,"logger":"http.auto_https","msg":"server is listening only on the HTTPS port but has no TLS connection policies; adding one to enable TLS","server_name":"srv0","https_port":8443}
+{"level":"info","ts":1709153034.065117,"logger":"http.auto_https","msg":"enabling automatic HTTP->HTTPS redirects","server_name":"srv0"}
+{"level":"info","ts":1709153034.0655942,"logger":"http","msg":"enabling HTTP/3 listener","addr":":8443"}
+{"level":"info","ts":1709153034.0657237,"logger":"http.log","msg":"server running","name":"srv0","protocols":["h1","h2","h3"]}
+{"level":"info","ts":1709153034.065773,"logger":"http.log","msg":"server running","name":"remaining_auto_https_redirects","protocols":["h1","h2","h3"]}
+{"level":"info","ts":1709153034.0657773,"logger":"http","msg":"enabling automatic TLS certificate management","domains":["app.example.com"]}
+{"level":"info","ts":1709153034.067568,"logger":"tls.obtain","msg":"acquiring lock","identifier":"app.example.com"}
+{"level":"info","ts":1709153034.0723445,"logger":"tls.obtain","msg":"lock acquired","identifier":"app.example.com"}
+{"level":"info","ts":1709153034.0725045,"logger":"tls.obtain","msg":"obtaining certificate","identifier":"app.example.com"}
+{"level":"info","ts":1709153034.0746508,"logger":"tls.obtain","msg":"certificate obtained successfully","identifier":"app.example.com"}
+{"level":"info","ts":1709153034.0747955,"logger":"tls.obtain","msg":"releasing lock","identifier":"app.example.com"}
+{"level":"warn","ts":1709153034.075301,"logger":"tls","msg":"stapling OCSP","error":"no OCSP stapling for [app.example.com]: no OCSP server specified in certificate","identifiers":["app.example.com"]}
+{"level":"warn","ts":1709153034.0854087,"logger":"pki.ca.local","msg":"installing root certificate (you might be prompted for password)","path":"storage:pki/authorities/local/root.crt"}
+{"level":"info","ts":1709153034.0862908,"msg":"warning: \"certutil\" is not available, install \"certutil\" with \"apt install libnss3-tools\" or \"yum install nss-tools\" and try again"}
+{"level":"info","ts":1709153034.0863998,"msg":"define JAVA_HOME environment variable to use the Java trust"}
+{"level":"info","ts":1709153034.1147833,"msg":"certificate installed properly in linux trusts"}
+{"level":"info","ts":1709153034.115633,"msg":"autosaved config (load with --resume flag)","file":"/root/.config/caddy/autosave.json"}
+{"level":"info","ts":1709153034.1156602,"msg":"serving initial configuration"}
+{"level":"info","ts":1709153034.1194596,"logger":"tls","msg":"cleaning storage unit","storage":"FileStorage:/root/.local/share/caddy"}
+{"level":"info","ts":1709153034.1202104,"logger":"tls","msg":"finished cleaning storage units"}
+{"level":"error","ts":1709153035.3550465,"logger":"http.log.error","msg":"tls: first record does not look like a TLS handshake","request":{"remote_ip":"127.0.0.1","remote_port":"37882","client_ip":"127.0.0.1","proto":"HTTP/2.0","method":"HEAD","host":"app.example.com","uri":"/","headers":{"User-Agent":["curl/7.88.1"],"Accept":["*/*"],"Authorization":[]},"tls":{"resumed":false,"version":772,"cipher_suite":4865,"proto":"h2","server_name":"app.example.com"}},"duration":0.783491203,"status":502,"err_id":"ux2c73jf5","err_trace":"reverseproxy.statusError (reverseproxy.go:1267)"}

@@ -24,7 +24,7 @@ function cleanup {
 }
 # Catch and cleanup stragglers if the script fails or is terminated.
 # Good for local testing, eliminates the need to manually remove docker containers.
-trap cleanup EXIT
+# trap cleanup EXIT         # commented out to keep everything for debugging
 
 
 normal_test_greenlight=false               # andrew's sentinel thing
@@ -53,7 +53,7 @@ if [ "$normal_test_greenlight" = true ]; then
     docker rm -f app-example-com
     rm $testLinkFile               # comment out to keep the file for debugging
 else
-    echo "******************* Skipping normal link test... (normal_test_greenlight was false)"
+    echo "******************* Skipping normal link test... \n(normal_test_greenlight was false)"
 fi
 
 
@@ -76,13 +76,13 @@ if [ "$caddy_greenlight" = true ]; then
     # 2. CADDY_TLS_PROXY to ------------------------------------- true
     sed -i 's/^\(\s*\)#\s*CADDY_TLS_PROXY: true/\1CADDY_TLS_PROXY: true/' $testLinkFile
 
-    # 3. CADDY_TLS_INSECURE to ---------------------------------------- false
-    sed -i 's/^\(\s*\)#\s*CADDY_TLS_INSECURE: true/\1CADDY_TLS_INSECURE: false/' $testLinkFile
+    # 3. For self-signed certificates, `CADDY_TLS_INSECURE` can be used to 
+    #    deactivate the certificate check.
+    sed -i 's/^\(\s*\)#\s*CADDY_TLS_INSECURE: true/\1CADDY_TLS_INSECURE: true/' $testLinkFile
 
-    # 4. FORWARD_ONLY to ----------------------------------- false
-    # sed -i 's/^\(\s*\)#\s*FORWARD_ONLY: true/\1FORWARD_ONLY: false/' $testLinkFile
-        #****** works when false ******
-        # otherwise can't ping:  "Error response from daemon: container [container identifier] is not running"
+    # 4. In the event you already have a reverse proxy which performs SSL termination for your 
+    # apps/services you can enable FORWARD_ONLY mode. Suppose you are using Traefik for SSL 
+    # termination... refer to the readme
 
     # docker compose -f $testLinkFile up > "$testLinkFile"-compose-up.log 2>&1
     docker compose -f $testLinkFile up -d
@@ -90,18 +90,19 @@ if [ "$caddy_greenlight" = true ]; then
     # assert http response code was 200
     # asserts basic auth is working with user: admin, password: admin
 
-    # (??) don't use "-k" for caddy if testing CADDY_TLS_INSECURE: false (aka https)
-    if ! docker compose exec gateway curl -k -H "Authorization: Basic YWRtaW46YWRtaW4=" --resolve app.example.com:443:127.0.0.1 https://app.example.com -I 2>&1 | tee curl-output.log |grep "HTTP/2 200"; then
+    if ! docker compose exec gateway curl -v -k -H "Authorization: Basic YWRtaW46YWRtaW4=" --resolve app.example.com:443:127.0.0.1 https://app.example.com -I 2>&1 | tee curl-output.log |grep "HTTP/2 200"; then
         FAILED="true"
     fi
-    docker compose -f $testLinkFile down --remove-orphans
-    docker rm -f app-example-com
-    rm $testLinkFile                 # comment out to keep the file for debugging
+
+    #**************commented out to keep everything for debugging
+    # docker compose -f $testLinkFile down --remove-orphans
+    # docker rm -f app-example-com
+    # rm $testLinkFile                 # comment out to keep the file for debugging
 fi
 
 
 # stop and remove gateway and sshd containers
-docker compose down || echo "'docker compose down' at the end had an issue"
+# docker compose down || echo "'docker compose down' at the end had an issue"
 
 # if FAILED is true return 1 else 0
 if [ ! -z ${FAILED+x} ]; then

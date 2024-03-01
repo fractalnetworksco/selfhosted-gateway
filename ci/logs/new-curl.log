@@ -1,0 +1,10 @@
+* Added app.example.com:443:127.0.0.1 to DNS cache
+* Hostname app.example.com was found in DNS cache
+*   Trying 127.0.0.1:443...
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* connect to 127.0.0.1 port 443 failed: Connection refused
+* Failed to connect to app.example.com port 443 after 0 ms: Connection refused
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+* Closing connection 0
+curl: (7) Failed to connect to app.example.com port 443 after 0 ms: Connection refused

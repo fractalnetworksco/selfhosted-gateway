@@ -33,7 +33,7 @@ trap cleanup EXIT
 normal_test_proceed=true
 if [ "$normal_test_proceed" = true ]; then
     echo "******************* Test Default Link *******************"
-    $testLinkFile="test-link.yaml"
+    testLinkFile="test-link.yaml"
 
     # generate a docker compose using templates + output
     cat test-link.template.yaml > $testLinkFile

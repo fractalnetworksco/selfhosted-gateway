@@ -13,11 +13,14 @@ services:
       - ./nginx/conf:/etc/nginx/conf.d
       - ./nginx:/root/nginx
     entrypoint: /root/nginx/entrypoint.sh
+
+# ******* Not being used, just here as a reference for dev purposes.
+
   link:
     image: fractalnetworks/gateway-client:latest
     environment:
-      LINK_DOMAIN: app.example.com
-      EXPOSE: https://nginx
+      LINK_DOMAIN: *.app.example.com
+      EXPOSE: tcp://minecraft:25565
       GATEWAY_CLIENT_WG_PRIVKEY: OIIH7ZyPZ7QnypcLv0/dUmat5Bt74IctlEw1cyjj3FA=
       GATEWAY_LINK_WG_PUBKEY: Jns+uf1vl/fgA9MiviDVQYgLJ2MPu2LETPFkMFnh2CE=
       GATEWAY_ENDPOINT: app-example-com:18521

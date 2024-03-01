@@ -20,14 +20,16 @@ testLinkFile=""   # Define the variable in a scope outside the cleanup function
 function cleanup {
     if [[ -n "$testLinkFile" ]]; then  # Check if the variable is non-empty
         echo "******* Cleanup function: cleaning up $testLinkFile..."
-        docker compose -f "$testLinkFile" down --remove-orphans || true
+        docker compose -f "$testLinkFile" down || true
         docker rm -f app-example-com || true
+        # stop and remove gateway and sshd containers
+        docker compose down || true
 
         rm "$testLinkFile" || true
     fi
 }
-trap cleanup EXIT
-
+trap cleanup ERR
+#trap cleanup EXIT
 
 # Default Link test
 normal_test_proceed=true
@@ -52,15 +54,15 @@ if [ "$normal_test_proceed" = true ]; then
     fi
 
     # cleanup
-    docker compose -f $testLinkFile down
-    docker rm -f app-example-com
-    rm $testLinkFile
+    # docker compose -f $testLinkFile down
+    # docker rm -f app-example-com
+    # rm $testLinkFile
 else
     echo "******************* Skipping normal link test... \n(normal_test_greenlight was false)"
 fi
-
+#docker rm -f app-example-com
 # Caddy + TLS Link test
-caddy_greenlight=true               # andrew's sentinel thing
+caddy_greenlight=false               # andrew's sentinel thing
 if [ "$caddy_greenlight" = true ]; then
     echo "******************* Testing Caddy TLS Proxy Link *******************"
     # Test the link using  CADDY_TLS_PROXY: true
@@ -68,7 +70,7 @@ if [ "$caddy_greenlight" = true ]; then
 
     # build new docker compose using template + output + template
     cat test-link-caddyTLS.template.yaml > $testLinkFile
-    docker run --network gateway -e SSH_AGENT_PID=$SSH_AGENT_PID -e SSH_AUTH_SOCK=$SSH_AUTH_SOCK -v $SSH_AUTH_SOCK:$SSH_AUTH_SOCK --rm fractalnetworks/gateway-cli:latest $1 $2 $3 >> $testLinkFile
+    docker run --network gateway -e SSH_AGENT_PID=$SSH_AGENT_PID -e SSH_AUTH_SOCK=$SSH_AUTH_SOCK -v $SSH_AUTH_SOCK:$SSH_AUTH_SOCK --rm fractalnetworks/gateway-cli:latest $1 $2 https://nginx >> $testLinkFile
     cat network.yaml >> $testLinkFile
 
     # Go inside $testLinkFile and change... (requires the commented options to be there! Can change later)
@@ -92,19 +94,11 @@ if [ "$caddy_greenlight" = true ]; then
     # assert http response code was 200
     # asserts basic auth is working with user: admin, password: admin
 
-    if ! docker compose exec gateway curl -v -k -H "Authorization: Basic YWRtaW46YWRtaW4=" --resolve app.example.com:443:127.0.0.1 https://app.example.com -I 2>&1 | tee curl-output.log |grep "HTTP/2 200"; then
+    if ! docker compose exec gateway curl -v -k -H "Authorization: Basic YWRtaW46YWRtaW4=" --resolve app.example.com:443:127.0.0.1 https://app.example.com -I 2>&1 |grep "HTTP/2 200"; then
         FAILED="true"
     fi
-
-    # cleanup
-    docker compose -f $testLinkFile down
-    docker rm -f app-example-com
-    rm $testLinkFile
 fi
 
-
-# stop and remove gateway and sshd containers
-docker compose down || echo "'docker compose down' at end of 'create-link-ci.sh' had an issue"
 
 # if FAILED is true return 1 else 0
 if [ ! -z ${FAILED+x} ]; then

@@ -19,7 +19,7 @@ testLinkFile=""   # Define the variable in a scope outside the cleanup function
 # Good for local testing, eliminates the need to manually remove docker containers.
 function cleanup {
     if [[ -n "$testLinkFile" ]]; then  # Check if the variable is non-empty
-        echo "\n******* Cleanup function: \ncleaning up $testLinkFile..."
+        echo "******* Cleanup function: cleaning up $testLinkFile..."
         docker compose -f "$testLinkFile" down --remove-orphans || true
         docker rm -f app-example-com || true
 
@@ -52,10 +52,9 @@ if [ "$normal_test_proceed" = true ]; then
     fi
 
     # cleanup
-    cleanup
-    # docker compose -f $testLinkFile down
-    # docker rm -f app-example-com
-    # rm $testLinkFile
+    docker compose -f $testLinkFile down
+    docker rm -f app-example-com
+    rm $testLinkFile
 else
     echo "******************* Skipping normal link test... \n(normal_test_greenlight was false)"
 fi
@@ -88,7 +87,6 @@ if [ "$caddy_greenlight" = true ]; then
     # apps/services you can enable FORWARD_ONLY mode. Suppose you are using Traefik for SSL 
     # termination... refer to the readme
 
-    # docker compose -f $testLinkFile up > "$testLinkFile"-compose-up.log 2>&1
     docker compose -f $testLinkFile up -d
     docker compose -f $testLinkFile exec link ping 10.0.0.1 -c 2
     # assert http response code was 200
@@ -99,10 +97,9 @@ if [ "$caddy_greenlight" = true ]; then
     fi
 
     # cleanup
-    cleanup
-    # docker compose -f $testLinkFile down --remove-orphans
-    # docker rm -f app-example-com
-    # rm $testLinkFile
+    docker compose -f $testLinkFile down
+    docker rm -f app-example-com
+    rm $testLinkFile
 fi
 
 

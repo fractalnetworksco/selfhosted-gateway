@@ -7,7 +7,5 @@ networks:
 services:
   nginx:
     image: nginx:latest
-    volumes:
-      - ./default-nginx-ssl.conf:/etc/nginx/templates/default-ssl.conf.template
     networks:
       - gateway

@@ -9,7 +9,7 @@
   - Caddy (Client)
 - Automatic client side HTTPS cert provisioning thanks to Caddy's automatic https.
 - Remote client IPs passed to local container via proxy protocol
-- Enable basic authentication by specifying env variable containig username and password
+- Enable basic authentication by specifying env variable containing username and password
 - Proxy generic TCP/UDP traffic to localhost with socat
 
 ## Video Overview & Setup Guide
@@ -40,7 +40,7 @@ This project automates the provisioning of **Reverse Proxy-over-VPN (RPoVPN)** W
 - Domain
   - Ability to create an `A` record for a domain name.
 - Gateway 
-  - A publically addressable Linux host to act as the `gateway`, typically a cloud VPS (Hetzner, Digital Ocean, etc..) with the following requirements:
+  - A publicly addressable Linux host to act as the `gateway`, typically a cloud VPS (Hetzner, Digital Ocean, etc..) with the following requirements:
   - SSH access
   - Ports 80/443 open (http/https)
   - The UDP port range listed by `cat /proc/sys/net/ipv4/ip_local_port_range` open to the Internet.
@@ -65,6 +65,7 @@ foo@gateway:~/selfhosted-gateway$ make gateway
 foo@local:~$ git clone ... && cd selfhosted-gateway
 foo@local:~/selfhosted-gateway$ make docker
 foo@local:~/selfhosted-gateway$ make link GATEWAY=root@123.456.789.101 FQDN=nginx.mydomain.com EXPOSE=nginx:80
+# docker compose --env-file ./nginx-mydomain-com.env ...
   link:
     image: fractalnetworks/gateway-client:latest
     environment:
@@ -76,29 +77,45 @@ foo@local:~/selfhosted-gateway$ make link GATEWAY=root@123.456.789.101 FQDN=ngin
     cap_add:
       - NET_ADMIN
 ```
-
-4. Add the generated snippet to your `docker-compose.yml` file:
-```yaml
-version: '3.9'
-services:
-  nginx:
-    image: nginx:latest
-  link:
-    image: fractalnetworks/gateway-client:latest
-    environment:
-      LINK_DOMAIN: nginx.mydomain.com
-      EXPOSE: nginx:80
-      GATEWAY_CLIENT_WG_PRIVKEY: 4M7Ap0euzTxq7gTA/WIYIt3nU+i2FvHUc9eYTFQ2CGI=
-      GATEWAY_LINK_WG_PUBKEY: Wipd6Pv7ttmII4/Oj82I5tmGZwuw6ucsE3G+hwsMR08=
-      GATEWAY_ENDPOINT: 123.456.789.101:49185
-    cap_add:
-      - NET_ADMIN
+The command will also generate a `.env` file in your current directory:
+```console
+foo@local:~/selfhosted-gateway$ cat ./nginx-mydomain-com.env
+EXPOSE=nginx:80
+GATEWAY_ENDPOINT=123.456.789.101:49185
+GATEWAY_LINK_WG_PUBKEY=Wipd6Pv7ttmII4/Oj82I5tmGZwuw6ucsE3G+hwsMR08=
+LINK_DOMAIN=nginx.mydomain.com
+WG_PRIVKEY=4M7Ap0euzTxq7gTA/WIYIt3nU+i2FvHUc9eYTFQ2CGI=
 ```
 
-5. Start your docker compose project as you would normally (`docker compose up -d`)
-6. 
-7. This will established the `link` to the `gateway` and automatically provision a TLS-certificate
+4. Add the `link` service to your existing `docker-compose.yml` file:
+  * by copy-pasting the output from the previous command:
+    ```yaml
+    version: '3.9'
+    services:
+      nginx:
+        image: nginx:latest
+      link:
+        image: fractalnetworks/gateway-client:latest
+        environment:
+          LINK_DOMAIN: nginx.mydomain.com
+          EXPOSE: nginx:80
+          GATEWAY_CLIENT_WG_PRIVKEY: 4M7Ap0euzTxq7gTA/WIYIt3nU+i2FvHUc9eYTFQ2CGI=
+          GATEWAY_LINK_WG_PUBKEY: Wipd6Pv7ttmII4/Oj82I5tmGZwuw6ucsE3G+hwsMR08=
+          GATEWAY_ENDPOINT: 123.456.789.101:49185
+        cap_add:
+          - NET_ADMIN
+    ```
+  * or by inserting the template snippet from [`src/create-link/link-compose-snippet.yml`](src/create-link/link-compose-snippet.yml).  
+    In this case, you will need to specify the `.env` file to use when running `docker-compose` commands:
+    ```console
+    foo@local:~/selfhosted-gateway$ docker compose --env-file ./nginx-mydomain-com.env up -d
+    ```
 
+    See [Docker Compose documentation "Substitute environment variables with an .env file"](https://docs.docker.com/compose/environment-variables/set-environment-variables/#substitute-with-an-env-file) for more information.
+
+5. Start your docker compose project as you would normally (`docker compose up -d`).  
+
+This will establish the `link` to the `gateway` and automatically provision a TLS-certificate.  
 **You may repeat steps 3-5 for as many services as you would like to expose using the same gateway**
 
 ## Extra

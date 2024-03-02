@@ -52,6 +52,10 @@ RESULT=($LINK_ENV)
 export GATEWAY_LINK_WG_PUBKEY="${RESULT[0]}"
 export GATEWAY_ENDPOINT="${GATEWAY_IP}:${RESULT[1]}"
 
+# save snippet variables to .env file
+cat link-compose-snippet.env | envsubst > "/workdir/${CONTAINER_NAME}.env"
+echo "# docker compose --env-file ./${CONTAINER_NAME}.env ..."
+
 cat link-compose-snippet.yml | envsubst
 
 # TODO add support for WireGuard config output

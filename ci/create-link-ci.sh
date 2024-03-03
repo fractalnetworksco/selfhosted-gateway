@@ -18,16 +18,16 @@ testLinkFile=""   # Define the variable in a scope outside the cleanup function
 function cleanup {
     if [[ -n "$testLinkFile" ]]; then  # Check if the variable is non-empty
         echo "******* Cleanup function: cleaning up $testLinkFile..."
-        docker compose -f "$testLinkFile" down || true
+        docker compose -f "$testLinkFile" down --timeout 0 || true
         docker rm -f app-example-com || true
         # stop and remove gateway and sshd containers
-        docker compose down || true
+        docker compose down --timeout 0 || true
 
         rm "$testLinkFile" || true
     fi
 }
 trap cleanup ERR
-#trap cleanup EXIT
+trap cleanup EXIT
 
 # Default Link test
 normal_test_proceed=true
@@ -53,14 +53,14 @@ if [ "$normal_test_proceed" = true ]; then
 
     # cleanup
     # docker compose -f $testLinkFile down
-    # docker rm -f app-example-com
+    #docker rm -f app-example-com
     # rm $testLinkFile
 else
     echo "******************* Skipping normal link test... \n(normal_test_greenlight was false)"
 fi
-#docker rm -f app-example-com
+docker rm -f app-example-com
 # Caddy + TLS Link test
-caddy_greenlight=false               # andrew's sentinel thing
+caddy_greenlight=true               # andrew's sentinel thing
 if [ "$caddy_greenlight" = true ]; then
     echo "******************* Testing Caddy TLS Proxy Link *******************"
     # Test the link using  CADDY_TLS_PROXY: true

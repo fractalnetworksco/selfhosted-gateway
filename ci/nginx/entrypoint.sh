@@ -10,3 +10,4 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
     -subj "/C=US/ST=YourState/L=YourCity/O=YourOrganization/OU=YourDepartment/CN=yourdomain.com"
 
 nginx -g "daemon off;"
+

@@ -35,21 +35,26 @@ export WG_PRIVKEY
 # This is the magic.
 # NOTE: All traffic for `*.subdomain.domain.tld`` will be routed to the container named `subdomain-domain-tld``
 # Also supports `subdomain.domain.tld` as well as apex `domain.tld`
-# *.domain.tld should resolve to the Gateway's public IPv4 address
+# *.domain.tld should resolve to the Gateway's access IPv4 address
 CONTAINER_NAME=$(fqdn_to_container_name "$LINK_DOMAIN")
 export CONTAINER_NAME
 
+# get gateway access ipv4 address
+GATEWAY_IP=$(getent ahostsv4 "$LINK_DOMAIN" | awk -v host="$LINK_DOMAIN" '$NF ~ host {print $1; exit}')
 
 LINK_CLIENT_WG_PUBKEY=$(echo $WG_PRIVKEY|wg pubkey)
 # LINK_ENV=$(ssh -o StrictHostKeyChecking=accept-new $SSH_HOST -p $SSH_PORT "bash -s" -- < ./remote.sh $CONTAINER_NAME $LINK_CLIENT_WG_PUBKEY > /dev/null 2>&1)
 LINK_ENV=$(ssh -o StrictHostKeyChecking=accept-new -o LogLevel=ERROR $SSH_HOST -p $SSH_PORT "bash -s" -- < ./remote.sh $CONTAINER_NAME $LINK_CLIENT_WG_PUBKEY)
 
-
 # convert to array
 RESULT=($LINK_ENV)
 
-export GATEWAY_LINK_WG_PUBKEY=${RESULT[0]}
-export GATEWAY_ENDPOINT=${RESULT[1]}
+export GATEWAY_LINK_WG_PUBKEY="${RESULT[0]}"
+export GATEWAY_ENDPOINT="${GATEWAY_IP}:${RESULT[1]}"
+
+# save snippet variables to .env file
+cat link-compose-snippet.env | envsubst > "/workdir/${CONTAINER_NAME}.env"
+echo "# docker compose --env-file ./${CONTAINER_NAME}.env ..."
 
 cat link-compose-snippet.yml | envsubst
 

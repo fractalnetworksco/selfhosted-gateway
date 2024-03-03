@@ -2,10 +2,12 @@
 set -e
 set -x
 
-cd ci/
-ssh-keygen -t ed25519 -f ./gateway-sim-key -N ""
+make setup || true
+make docker
 
-docker network create gateway || true   # create docker network if not exists
+cd ci/
+yes| ssh-keygen -t ed25519 -f ./gateway-sim-key -N ""
+
 docker compose up -d --build
 eval $(ssh-agent -s)
 ssh-add ./gateway-sim-key
@@ -51,13 +53,11 @@ if [ "$normal_test_proceed" = true ]; then
         FAILED="true"
     fi
 
-    # cleanup
-    # docker compose -f $testLinkFile down
-    #docker rm -f app-example-com
-    # rm $testLinkFile
 else
     echo "******************* Skipping normal link test... \n(normal_test_greenlight was false)"
 fi
+
+# remove test link so the next test can recreate it
 docker rm -f app-example-com
 # Caddy + TLS Link test
 caddy_greenlight=true               # andrew's sentinel thing

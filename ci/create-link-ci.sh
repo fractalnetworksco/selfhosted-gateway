@@ -29,7 +29,7 @@ function cleanup {
     fi
 }
 trap cleanup ERR
-#trap cleanup EXIT
+trap cleanup EXIT
 
 # Default Link test
 normal_test_proceed=true
@@ -60,9 +60,11 @@ if [ "$normal_test_proceed" = true ]; then
 else
     echo "******************* Skipping normal link test... \n(normal_test_greenlight was false)"
 fi
-#docker rm -f app-example-com
+
+# remove test link so the next test can recreate it
+docker rm -f app-example-com
 # Caddy + TLS Link test
-caddy_greenlight=false               # andrew's sentinel thing
+caddy_greenlight=true               # andrew's sentinel thing
 if [ "$caddy_greenlight" = true ]; then
     echo "******************* Testing Caddy TLS Proxy Link *******************"
     # Test the link using  CADDY_TLS_PROXY: true

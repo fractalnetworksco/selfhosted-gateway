@@ -15,6 +15,3 @@ jobs:
 
     - name: Launch gateway and create link on gateway
       run: make link-ci
-
-    - name: Cleanup
-      run: docker compose -f ./ci/docker-compose.yaml down

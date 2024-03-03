@@ -1,0 +1,15 @@
+version: '3.9'
+
+networks:
+  gateway:
+      external: true
+
+services:
+  nginx:
+    image: nginx:latest
+    networks:
+      - gateway
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ./nginx:/root/nginx
+    entrypoint: /root/nginx/entrypoint.sh

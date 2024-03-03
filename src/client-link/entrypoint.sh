@@ -17,9 +17,9 @@ wg set link0 peer $GATEWAY_LINK_WG_PUBKEY allowed-ips 10.0.0.1/32 persistent-kee
 if [ -z ${FORWARD_ONLY+x} ]; then
 
     echo "Using caddy with SSL termination to forward traffic to app."
-    if [ ! -z ${CADDY_TLS_PROXY+x} ]; then
+    if [ ! -z ${CADDY_TLS_PROXY+x} ]; then          # if CADDY_TLS_PROXY is set
         echo "Configure Caddy for use with TLS backend"
-        if [ ! -z ${CADDY_TLS_INSECURE+x} ]; then
+        if [ ! -z ${CADDY_TLS_INSECURE+x} ]; then   # if CADDY_TLS_INSECURE
             echo "Skip TLS verification"
             export EXPOSE=$(cat <<-END
 $EXPOSE {
@@ -32,7 +32,7 @@ $EXPOSE {
 END
 )
 
-        else
+        else    # CADDY_TLS_INSECURE is false
             export EXPOSE=$(cat <<-END
 $EXPOSE {
          transport http {

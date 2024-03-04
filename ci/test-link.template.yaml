@@ -9,3 +9,10 @@ services:
     image: nginx:latest
     networks:
       - gateway
+    depends_on:
+      - link
+    # health check nginx
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      timeout: 1s
+      interval: 1s

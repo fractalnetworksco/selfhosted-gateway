@@ -13,3 +13,9 @@ services:
       - ./nginx/conf:/etc/nginx/conf.d
       - ./nginx:/root/nginx
     entrypoint: /root/nginx/entrypoint.sh
+    depends_on:
+      - link
+    healthcheck:
+      test: ["CMD", "curl", "-k", "-f", "https://localhost"]
+      timeout: 5s
+      interval: 1s

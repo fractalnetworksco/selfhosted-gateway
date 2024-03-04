@@ -58,6 +58,7 @@ if [ "$normal_test_proceed" = true ]; then
 
     # remove test link so the next test can recreate it
     docker rm -f app-example-com
+    rm $testLinkFile
 else
     echo "******************* Skipping normal link test... \n(normal_test_greenlight was false)"
 fi

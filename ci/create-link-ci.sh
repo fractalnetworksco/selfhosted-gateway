@@ -44,8 +44,8 @@ if [ "$normal_test_proceed" = true ]; then
     # set the gateway endpoint to the gateway link container
     sed -i 's/^\(\s*GATEWAY_ENDPOINT:\).*/\1 app-example-com:18521/' $testLinkFile
 
-    docker compose -f $testLinkFile up -d
-    docker compose -f $testLinkFile exec link ping 10.0.0.1 -c 2
+    docker compose -f $testLinkFile up -d --wait
+    docker compose -f $testLinkFile exec link ping 10.0.0.1 -c 1
     # assert http response code was 200
     # asserts basic auth is working with user: admin, password: admin
 
@@ -86,9 +86,9 @@ if [ "$caddy_greenlight" = true ]; then
     # 4. In the event you already have a reverse proxy which performs SSL termination for your 
     # apps/services you can enable FORWARD_ONLY mode. Suppose you are using Traefik for SSL 
     # termination... refer to the readme
-
-    docker compose -f $testLinkFile up -d
-    docker compose -f $testLinkFile exec link ping 10.0.0.1 -c 2
+    docker compose -f $testLinkFile down -t 0
+    docker compose -f $testLinkFile up -d --wait
+    docker compose -f $testLinkFile exec link ping 10.0.0.1 -c 1
     # assert http response code was 200
     # asserts basic auth is working with user: admin, password: admin
 

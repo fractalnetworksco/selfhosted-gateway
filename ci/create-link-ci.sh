@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-set -x
+# set -x        # uncomment for debugging
 
 make setup || true
 make docker
@@ -51,14 +51,19 @@ if [ "$normal_test_proceed" = true ]; then
 
     if ! docker compose exec gateway curl -k -H "Authorization: Basic YWRtaW46YWRtaW4=" --resolve app.example.com:443:127.0.0.1 https://app.example.com -I |grep "HTTP/2 200"; then
         FAILED="true"
+        echo -e "\033[0;31m Default Link curl FAILED\033[0m"     # red for failure
+    else
+        echo -e "\033[0;32m Default Link curl SUCCESS\033[0m"     # green for success
     fi
 
+    # remove test link so the next test can recreate it
+    docker rm -f app-example-com
+    rm $testLinkFile
 else
     echo "******************* Skipping normal link test... \n(normal_test_greenlight was false)"
 fi
 
-# remove test link so the next test can recreate it
-docker rm -f app-example-com
+
 # Caddy + TLS Link test
 caddy_greenlight=true               # andrew's sentinel thing
 if [ "$caddy_greenlight" = true ]; then
@@ -94,6 +99,9 @@ if [ "$caddy_greenlight" = true ]; then
 
     if ! docker compose exec gateway curl -v -k -H "Authorization: Basic YWRtaW46YWRtaW4=" --resolve app.example.com:443:127.0.0.1 https://app.example.com -I 2>&1 |grep "HTTP/2 200"; then
         FAILED="true"
+        echo -e "\033[0;31m Caddy TLS Link curl FAILED\033[0m"     # red for failure
+    else
+        echo -e "\033[0;32m Caddy TLS Link curl SUCCESS\033[0m"     # green for success
     fi
 fi
 

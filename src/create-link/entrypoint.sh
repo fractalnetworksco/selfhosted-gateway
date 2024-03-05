@@ -40,7 +40,7 @@ CONTAINER_NAME=$(fqdn_to_container_name "$LINK_DOMAIN")
 export CONTAINER_NAME
 
 # get gateway access ipv4 address
-GATEWAY_IP=$(getent ahostsv4 "$LINK_DOMAIN" | awk -v host="$LINK_DOMAIN" '$NF ~ host {print $1; exit}')
+GATEWAY_IP=$(getent ahostsv4 "$LINK_DOMAIN" | awk '{print $1; exit}')
 
 LINK_CLIENT_WG_PUBKEY=$(echo $WG_PRIVKEY|wg pubkey)
 # LINK_ENV=$(ssh -o StrictHostKeyChecking=accept-new $SSH_HOST -p $SSH_PORT "bash -s" -- < ./remote.sh $CONTAINER_NAME $LINK_CLIENT_WG_PUBKEY > /dev/null 2>&1)

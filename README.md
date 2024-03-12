@@ -50,6 +50,7 @@ This project automates the provisioning of **Reverse Proxy-over-VPN (RPoVPN)** W
   - `docker`, `git` & `make` installed locally
 
 ### Steps
+#### Gateway
 1. Point `*.mydomain.com` (DNS A Record) to the IPv4 & IPv6 address of your VPS Gateway host.
 
 2. Connect to the `gateway` via SSH and setup the `gateway` service:
@@ -59,8 +60,8 @@ foo@gateway:~/selfhosted-gateway$ make docker
 foo@gateway:~/selfhosted-gateway$ make setup
 foo@gateway:~/selfhosted-gateway$ make gateway
 ```
-
-3. To generate a `link` docker compose snippet run the following commands:
+#### Client
+3. To generate a `link` docker compose snippet run the following commands from the `client`:
 ```console
 foo@local:~$ git clone ... && cd selfhosted-gateway
 foo@local:~/selfhosted-gateway$ make docker

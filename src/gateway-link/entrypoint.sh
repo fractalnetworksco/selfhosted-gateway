@@ -35,5 +35,7 @@ iptables -t nat -A POSTROUTING -o link0 -p tcp --dport 8080 -j SNAT --to-source 
 iptables -t nat -A POSTROUTING -o link0 -p tcp --dport 8443 -j SNAT --to-source 10.0.0.1
 
 # generic udp proxies
-socat UDP4-RECVFROM:18522,fork UDP4-SENDTO:10.0.0.2:18522,sp=18524,reuseaddr &
-socat UDP4-RECVFROM:18523,fork UDP4-SENDTO:10.0.0.2:18522,sp=18525,reuseaddr
+#socat UDP4-RECVFROM:18522,fork UDP4-SENDTO:10.0.0.2:18522,sp=18524,reuseaddr &
+#socat UDP4-RECVFROM:18523,fork UDP4-SENDTO:10.0.0.2:18522,sp=18525,reuseaddr
+socat TCP4-LISTEN:25565,fork,reuseaddr TCP4:10.0.0.2:25565,reuseaddr
+#socat TCP4-LISTEN:8443,fork,reuseaddr TCP4:$EXPOSE_HTTPS,reuseaddr

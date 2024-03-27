@@ -87,6 +87,6 @@ END
     caddy run --config $CADDYFILE
 else
     echo "Caddy is disabled. Using socat to forward traffic to app."
-    socat TCP4-LISTEN:8080,fork,reuseaddr TCP4:$EXPOSE,reuseaddr &
-    socat TCP4-LISTEN:8443,fork,reuseaddr TCP4:$EXPOSE_HTTPS,reuseaddr
+    socat TCP4-LISTEN:25565,fork,reuseaddr TCP4:$EXPOSE,reuseaddr 
+    # socat TCP4-LISTEN:8443,fork,reuseaddr TCP4:$EXPOSE_HTTPS,reuseaddr
 fi

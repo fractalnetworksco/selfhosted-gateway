@@ -12,7 +12,7 @@
       TLS_INTERNAL: true
       # CADDY_TLS_PROXY: true
       # CADDY_TLS_INSECURE: true
-      # FORWARD_ONLY: true
+      FORWARD_ONLY: ${FORWARD_ONLY}
     restart: unless-stopped
     cap_add:
       - NET_ADMIN

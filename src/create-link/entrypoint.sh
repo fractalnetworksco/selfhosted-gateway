@@ -37,7 +37,6 @@ export FORWARD_ONLY="false"
 if [[ $( echo "$EXPOSE" | tr '[:upper:]' '[:lower:]' )  == "tcp://"* ]]; then
 	FORWARD_PROTOCOL="tcp"
   EXPOSE=${EXPOSE#*://}
-  echo $EXPOSE
   export FORWARD_ONLY="true"
 
 fi
@@ -48,6 +47,9 @@ if [[ $( echo "$EXPOSE" | tr '[:upper:]' '[:lower:]' )  == "udp://"* ]]; then
   export FORWARD_ONLY="true"
 fi
 
+# Strip container name off of our EXPOSE variable. 
+# Variable looks something like "ngnx:80", and we want just the port, "80" in this case
+FORWARD_PORT=${EXPOSE#*:}
 
 
 
@@ -66,8 +68,7 @@ GATEWAY_IP=$(getent ahostsv4 "$LINK_DOMAIN" | awk '{print $1; exit}')
 
 LINK_CLIENT_WG_PUBKEY=$(echo $WG_PRIVKEY|wg pubkey)
 # LINK_ENV=$(ssh -o StrictHostKeyChecking=accept-new $SSH_HOST -p $SSH_PORT "bash -s" -- < ./remote.sh $CONTAINER_NAME $LINK_CLIENT_WG_PUBKEY > /dev/null 2>&1)
-echo ${EXPOSE#*:}
-LINK_ENV=$(ssh -o StrictHostKeyChecking=accept-new -o LogLevel=ERROR $SSH_HOST -p $SSH_PORT "bash -s" -- < ./remote.sh $CONTAINER_NAME $LINK_CLIENT_WG_PUBKEY ${EXPOSE#*:} $FORWARD_PROTOCOL)
+LINK_ENV=$(ssh -o StrictHostKeyChecking=accept-new -o LogLevel=ERROR $SSH_HOST -p $SSH_PORT "bash -s" -- < ./remote.sh $CONTAINER_NAME $LINK_CLIENT_WG_PUBKEY $FORWARD_PORT $FORWARD_PROTOCOL)
 
 # convert to array
 RESULT=($LINK_ENV)

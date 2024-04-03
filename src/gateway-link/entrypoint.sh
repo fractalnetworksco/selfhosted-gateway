@@ -42,6 +42,10 @@ then
     socat UDP4-RECVFROM:18522,fork UDP4-SENDTO:10.0.0.2:18522,sp=18524,reuseaddr &
     socat UDP4-RECVFROM:18523,fork UDP4-SENDTO:10.0.0.2:18522,sp=18525,reuseaddr
 else
-    socat TCP4-LISTEN:$1,fork,reuseaddr TCP4:10.0.0.2:$1,reuseaddr
+    # Just opening both TCP and UDP is the quick and dirty way of ensuring both protocols work
+    # In the future, specifying a protocol in the docker compose snippet may be necessary
+    # -- 2024-04-03 Zach
+    socat TCP4-LISTEN:$1,fork,reuseaddr TCP4:10.0.0.2:$1,reuseaddr &
+    socat UDP4-LISTEN:$1,fork,reuseaddr UDP4:10.0.0.2:$1,reuseaddr
 fi
 #socat TCP4-LISTEN:8443,fork,reuseaddr TCP4:$EXPOSE_HTTPS,reuseaddr

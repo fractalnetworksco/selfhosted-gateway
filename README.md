@@ -20,7 +20,7 @@
 
 ## Overview
 
-This project automates the provisioning of **Reverse Proxy-over-VPN (RPoVPN)** WireGuard tunnels with Caddy and NGINX. It is particularly well suited for exposing docker compose services defined in a `docker-compose` file to the public Internet. There's no code or APIs, just an ultra generic NGINX config and some short provisioning bash script. TLS certs are provisioned automatically with Caddy's Automatic HTTPS feature via Let's Encrypt or ZeroSSL.
+This project automates the provisioning of **Reverse Proxy-over-VPN (RPoVPN)** WireGuard tunnels with Caddy and NGINX. It is particularly well suited for exposing docker compose services defined in a `docker-compose` file to the public Internet. There's no code or APIs, just an ultra generic NGINX config and some short provisioning bash script. TLS certs are provisioned automatically with Caddy's Automatic HTTPS feature via Let's Encrypt or ZeroSSL. This project also allows for the creation of UDP & TCP self hosted servers. We will provide an example of the TCP use case using a minecraft server.
 
 ## Use cases
 
@@ -33,6 +33,10 @@ This project automates the provisioning of **Reverse Proxy-over-VPN (RPoVPN)** W
   - Obviates the need for a static IP or expose your home's public IP address to the world.
   - Utilizes advanced network isolation capabilities of Docker (thanks to Linux network namespaces) in order to isolate locally exposed services from your home network and other local docker services.
   - Built on open-source technologies (WireGuard, Caddy and NGINX).
+
+3. **Using TCP protocalls for self-hosting a game server (Minecraft in this example case):**
+  - Removes the need for direct ability to port forward.
+  - Ability to hide home IP adress.
 
 ## Getting Started
 
@@ -48,6 +52,10 @@ This project automates the provisioning of **Reverse Proxy-over-VPN (RPoVPN)** W
 - Client
   - An existing `docker-compose.yml` that you would like to expose to the Internet.
   - `docker`, `git` & `make` installed locally
+- Game
+  - An existing docker container for the game
+  - In our example we will be using Minecraft
+  - The Minecraft container we use is located at 'https://github.com/itzg/docker-minecraft-server'
 
 ### Steps
 #### Gateway
@@ -61,20 +69,30 @@ foo@gateway:~/selfhosted-gateway$ make setup
 foo@gateway:~/selfhosted-gateway$ make gateway
 ```
 #### Client
-3. To generate a `link` docker compose snippet run the following commands from the `client`:
+3a. To generate a `link` docker compose snippet run the following commands from the `client`:
 ```console
 foo@local:~$ git clone ... && cd selfhosted-gateway
 foo@local:~/selfhosted-gateway$ make docker
 foo@local:~/selfhosted-gateway$ make link GATEWAY=root@123.456.789.101 FQDN=nginx.mydomain.com EXPOSE=nginx:80
+docker run -e SSH_AGENT_PID=$SSH_AGENT_PID -e SSH_AUTH_SOCK=$SSH_AUTH_SOCK -v $SSH_AUTH_SOCK:$SSH_AUTH_SOCK -v "$PWD:/workdir" --rm -it fractalnetworks/gateway-cli:latest root@123.456.789.101 nginx.mydomain.com nginx:80
 # docker compose --env-file ./nginx-mydomain-com.env ...
   link:
     image: fractalnetworks/gateway-client:latest
     environment:
       LINK_DOMAIN: nginx.mydomain.com
-      EXPOSE: nginx:80
+      EXPOSE: niginx:80
       GATEWAY_CLIENT_WG_PRIVKEY: 4M7Ap0euzTxq7gTA/WIYIt3nU+i2FvHUc9eYTFQ2CGI=
       GATEWAY_LINK_WG_PUBKEY: Wipd6Pv7ttmII4/Oj82I5tmGZwuw6ucsE3G+hwsMR08=
       GATEWAY_ENDPOINT: 123.456.789.101:49185
+      # Remove following to disable basic authentication
+      BASIC_AUTH: admin:admin
+      # Remove following line to get certs from Let's Encrypt
+      TLS_INTERNAL: true
+      # CADDY_TLS_PROXY: true
+      # CADDY_TLS_INSECURE: true
+      FORWARD_ONLY: false
+      NEW_FORWARDING_BEHAVIOR: true
+    restart: unless-stopped
     cap_add:
       - NET_ADMIN
 ```
@@ -85,7 +103,8 @@ EXPOSE=nginx:80
 GATEWAY_ENDPOINT=123.456.789.101:49185
 GATEWAY_LINK_WG_PUBKEY=Wipd6Pv7ttmII4/Oj82I5tmGZwuw6ucsE3G+hwsMR08=
 LINK_DOMAIN=nginx.mydomain.com
-WG_PRIVKEY=4M7Ap0euzTxq7gTA/WIYIt3nU+i2FvHUc9eYTFQ2CGI=
+GATEWAY_CLIENT_WG_PRIVKEY=4M7Ap0euzTxq7gTA/WIYIt3nU+i2FvHUc9eYTFQ2CGI=
+FORWARD_ONLY=false
 ```
 
 4. Add the `link` service to your existing `docker-compose.yml` file:

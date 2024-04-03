@@ -17,7 +17,8 @@ wg set link0 peer $GATEWAY_LINK_WG_PUBKEY allowed-ips 10.0.0.1/32 persistent-kee
 # if EXPOSE is the same as in the docker-compose snippet, this looks like "nginx:80". We want just the port for reasons later.
 PORT=${EXPOSE#*:}
 
-if [ -z ${FORWARD_ONLY+x} ]; then
+
+if [ "$FORWARD_ONLY" == "false" ]; then
 
     echo "Using caddy with SSL termination to forward traffic to app."
     if [ ! -z ${CADDY_TLS_PROXY+x} ]; then          # if CADDY_TLS_PROXY is set
@@ -79,7 +80,18 @@ END
     envsubst < /etc/Caddyfile.template > $CADDYFILE
     caddy run --config $CADDYFILE
 else
-    echo "Caddy is disabled. Using socat to forward traffic to app."
-    socat TCP4-LISTEN:$PORT,fork,reuseaddr TCP4:$EXPOSE,reuseaddr 
-    # socat TCP4-LISTEN:8443,fork,reuseaddr TCP4:$EXPOSE_HTTPS,reuseaddr
+    # I needed a way to ensure the old behavior was available while enabling the new forwarding behavior for new snippets
+    # -- 2024-04-03 Zach
+    if [ "$NEW_FORWARDING_BEHAVIOR" = "true" ]
+    then
+        # Just opening both TCP and UDP is the quick and dirty way of ensuring both protocols work
+        # In the future, specifying a protocol in the docker compose snippet may be necessary
+        # -- 2024-04-03 Zach
+        socat TCP4-LISTEN:$PORT,fork,reuseaddr TCP4:$EXPOSE,reuseaddr &
+        socat UDP4-LISTEN:$PORT,fork,reuseaddr UDP4:$EXPOSE,reuseaddr 
+    else
+        echo "Caddy is disabled. Using socat to forward traffic to app."
+        socat TCP4-LISTEN:8080,fork,reuseaddr TCP4:$EXPOSE,reuseaddr &
+        socat TCP4-LISTEN:8443,fork,reuseaddr TCP4:$EXPOSE_HTTPS,reuseaddr
+    fi
 fi

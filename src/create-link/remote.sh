@@ -15,7 +15,7 @@ WIREGUARD_PORT=$(docker port $CONTAINER_NAME 18521/udp| head -n 1| sed "s/0\.0\.
 docker rm -f $CONTAINER_ID 2>& 1>NUL
 
 # create gateway-link container
-if [ -n $FORWARD_PORT ] && [ -n $FORWARD_PROTOCOL ]
+if [ -n "$FORWARD_PORT" ] && [ -n "$FORWARD_PROTOCOL" ]
 then
     CONTAINER_ID=$(docker run --name $CONTAINER_NAME --network gateway -p $WIREGUARD_PORT:18521/udp -p $FORWARD_PORT:$FORWARD_PORT/$FORWARD_PROTOCOL --cap-add NET_ADMIN --restart unless-stopped -it -e LINK_CLIENT_WG_PUBKEY=$LINK_CLIENT_WG_PUBKEY -d fractalnetworks/gateway-link:latest $FORWARD_PORT $FORWARD_PROTOCOL)
 else

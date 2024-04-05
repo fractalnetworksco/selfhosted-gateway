@@ -69,7 +69,7 @@ foo@gateway:~/selfhosted-gateway$ make setup
 foo@gateway:~/selfhosted-gateway$ make gateway
 ```
 #### Client
-3a. To generate a `link` docker compose snippet run the following commands from the `client`:
+3. To generate a `link` docker compose snippet run the following commands from the `client`:
 ```console
 foo@local:~$ git clone ... && cd selfhosted-gateway
 foo@local:~/selfhosted-gateway$ make docker

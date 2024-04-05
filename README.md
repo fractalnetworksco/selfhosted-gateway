@@ -55,7 +55,7 @@ This project automates the provisioning of **Reverse Proxy-over-VPN (RPoVPN)** W
 - Game
   - An existing docker container for the game
   - In our example we will be using Minecraft
-  - The Minecraft container we use is located at 'https://github.com/itzg/docker-minecraft-server'
+  - Our wiki page for a [selfhosted Mincecraft server](https://github.com/fractalnetworksco/selfhosted-gateway/wiki/Mincecraft-Self-Hosted-Server)
 
 ### Steps
 #### Gateway

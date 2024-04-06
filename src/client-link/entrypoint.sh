@@ -14,9 +14,6 @@ ip link set link0 mtu $LINK_MTU
 
 wg set link0 peer $GATEWAY_LINK_WG_PUBKEY allowed-ips 10.0.0.1/32 persistent-keepalive 30 endpoint $GATEWAY_ENDPOINT
 
-# if EXPOSE is the same as in the docker-compose snippet, this looks like "nginx:80". We want just the port for reasons later.
-PORT=${EXPOSE#*:}
-
 
 if [ "$FORWARD_ONLY" == "false" ]; then
 
@@ -97,8 +94,8 @@ else
         # Just opening both TCP and UDP is the quick and dirty way of ensuring both protocols work
         # In the future, specifying a protocol in the docker compose snippet may be necessary
         # -- 2024-04-03 Zach
-        socat TCP4-LISTEN:$PORT,fork,reuseaddr TCP4:$EXPOSE,reuseaddr &
-        socat UDP4-LISTEN:$PORT,fork,reuseaddr UDP4:$EXPOSE,reuseaddr 
+        socat TCP4-LISTEN:$CENTER_PORT,fork,reuseaddr TCP4:$SERVICE:$BACK_PORT,reuseaddr,fork &
+        socat UDP4-LISTEN:$CENTER_PORT,fork,reuseaddr UDP4:$SERVICE:$BACK_PORT,reuseaddr,fork 
     else
         echo "Caddy is disabled. Using socat to forward traffic to app."
         socat TCP4-LISTEN:8080,fork,reuseaddr TCP4:$EXPOSE,reuseaddr &

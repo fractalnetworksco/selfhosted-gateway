@@ -3,6 +3,7 @@
 
 set -e
 
+
 #simply generates a sane name for the link container on the remote gateway.
 function fqdn_to_container_name() {
     local fqdn="$1"
@@ -33,23 +34,31 @@ export EXPOSE=$3
 export FORWARD_ONLY="false"
 
 #if EXPOSE has a TCP:// or UDP://, set the appropriate protocol
+# Shape of EXPOSE should be TCP://forward_port:service:back_port
+# The forward_port is what is exposed from the gateway. It's best to set this to a known
+# default port for whatver service you're exposing
+# Back port might be best left as a wildcard
+decompose_expose_into_parts() {
+    local COPY_OF_EXPOSE=$1
+    FORWARD_PROTOCOL=${COPY_OF_EXPOSE%%:*} 
+    export FORWARD_PROTOCOL=$( echo "$FORWARD_PROTOCOL" | tr '[:upper:]' '[:lower:]' ) # make sure our protocol is lowercase
+    COPY_OF_EXPOSE=${COPY_OF_EXPOSE#*://}                       #forward.service.back
+    export FORWARD_PORT=${COPY_OF_EXPOSE%%:*}
+    export BACK_PORT=${COPY_OF_EXPOSE##*:};
+    SERVICE=${COPY_OF_EXPOSE#*:}
+    export SERVICE=${SERVICE%:*};
 
-if [[ $( echo "$EXPOSE" | tr '[:upper:]' '[:lower:]' )  == "tcp://"* ]]; then
-	FORWARD_PROTOCOL="tcp"
-  EXPOSE=${EXPOSE#*://}
+}
+
+raw_tcp_udp?() {
+    shopt -s nocasematch
+    [[ "$1" =~ udp:// ]] || [[ "$1" =~ tcp:// ]]; return $?;
+}
+
+if raw_tcp_udp? $EXPOSE; then
+  decompose_expose_into_parts $EXPOSE
   export FORWARD_ONLY="true"
-
 fi
-
-if [[ $( echo "$EXPOSE" | tr '[:upper:]' '[:lower:]' )  == "udp://"* ]]; then
-	FORWARD_PROTOCOL="udp"
-  EXPOSE=${EXPOSE#*://}
-  export FORWARD_ONLY="true"
-fi
-
-# Strip container name off of our EXPOSE variable. 
-# Variable looks something like "ngnx:80", and we want just the port, "80" in this case
-FORWARD_PORT=${EXPOSE#*:}
 
 
 
@@ -68,19 +77,30 @@ GATEWAY_IP=$(getent ahostsv4 "$LINK_DOMAIN" | awk '{print $1; exit}')
 
 LINK_CLIENT_WG_PUBKEY=$(echo $WG_PRIVKEY|wg pubkey)
 # LINK_ENV=$(ssh -o StrictHostKeyChecking=accept-new $SSH_HOST -p $SSH_PORT "bash -s" -- < ./remote.sh $CONTAINER_NAME $LINK_CLIENT_WG_PUBKEY > /dev/null 2>&1)
-LINK_ENV=$(ssh -o StrictHostKeyChecking=accept-new -o LogLevel=ERROR $SSH_HOST -p $SSH_PORT "bash -s" -- < ./remote.sh $CONTAINER_NAME $LINK_CLIENT_WG_PUBKEY $FORWARD_PORT $FORWARD_PROTOCOL)
+LINK_ENV=$(ssh -o StrictHostKeyChecking=accept-new -o LogLevel=ERROR $SSH_HOST -p $SSH_PORT "bash -s" -- < ./remote.sh $CONTAINER_NAME $LINK_CLIENT_WG_PUBKEY $FORWARD_PORT $FORWARD_PROTOCOL $BACK_PORT)
 
 # convert to array
 RESULT=($LINK_ENV)
 
 export GATEWAY_LINK_WG_PUBKEY="${RESULT[0]}"
 export GATEWAY_ENDPOINT="${GATEWAY_IP}:${RESULT[1]}"
+export CENTER_PORT="${RESULT[2]}"
 
-# save snippet variables to .env file
-cat link-compose-snippet.env | envsubst > "/workdir/${CONTAINER_NAME}.env"
-echo "# docker compose --env-file ./${CONTAINER_NAME}.env ..."
 
-cat link-compose-snippet.yml | envsubst
+if raw_tcp_udp? $EXPOSE; then
+  # save snippet variables to .env file
+  cat link-compose-snippet-tcp-udp.env | envsubst > "/workdir/${CONTAINER_NAME}.env"
+  echo "# docker compose --env-file ./${CONTAINER_NAME}.env ..."
 
-# TODO add support for WireGuard config output
-# Fractal Networks is hiring: jobs@fractalnetworks.co
+  cat link-compose-snippet-tcp-udp.yml | envsubst
+else
+  # save snippet variables to .env file
+  cat link-compose-snippet.env | envsubst > "/workdir/${CONTAINER_NAME}.env"
+  echo "# docker compose --env-file ./${CONTAINER_NAME}.env ..."
+
+  cat link-compose-snippet.yml | envsubst
+
+  # TODO add support for WireGuard config output
+  # Fractal Networks is hiring: jobs@fractalnetworks.co
+
+fi

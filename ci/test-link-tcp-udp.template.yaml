@@ -1,0 +1,13 @@
+version: '3.9'
+
+networks:
+  gateway:
+      external: true
+
+services:
+  nc-server:
+    container_name: nc-server
+    image: subfuzion/netcat
+    networks:
+      - gateway
+    command: -l 8080

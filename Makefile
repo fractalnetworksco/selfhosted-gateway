@@ -20,3 +20,5 @@ link-macos:
 
 link-ci:
 	./ci/create-link-ci.sh gateway-sshd app.example.com nginx:80
+	./ci/create-link-ci-tcp-udp.sh gateway-sshd app.example.com TCP://8080:nc-server:8080
+

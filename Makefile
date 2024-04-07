@@ -20,3 +20,4 @@ link-macos:
 
 link-ci:
 	./ci/create-link-ci.sh $(GATEWAY) $(FQDN) nginx:80
+	./ci/create-link-ci-tcp-udp.sh $(GATEWAY) $(FQDN) TCP://8080:nc-server:8080

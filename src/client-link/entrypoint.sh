@@ -83,9 +83,9 @@ else
     then
         # Just opening both TCP and UDP is the quick and dirty way of ensuring both protocols work
         # In the future, specifying a protocol in the docker compose snippet may be necessary
-        # -- 2024-04-03 Zach
-        socat TCP4-LISTEN:$CENTER_PORT,fork,reuseaddr TCP4:$SERVICE:$BACK_PORT,reuseaddr,fork &
-        socat UDP4-LISTEN:$CENTER_PORT,fork,reuseaddr UDP4:$SERVICE:$BACK_PORT,reuseaddr,fork 
+        # -- 2024-04-07 zacharylott94@gmail.com
+        socat TCP4-LISTEN:$CENTER_PORT,fork,reuseaddr TCP4:$EXPOSE,reuseaddr,fork &
+        socat UDP4-LISTEN:$CENTER_PORT,fork,reuseaddr UDP4:$EXPOSE,reuseaddr,fork 
     else
         echo "Caddy is disabled. Using socat to forward traffic to app."
         socat TCP4-LISTEN:8080,fork,reuseaddr TCP4:$EXPOSE,reuseaddr &

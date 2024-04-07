@@ -14,9 +14,7 @@
       # CADDY_TLS_INSECURE: true
       FORWARD_ONLY: ${FORWARD_ONLY}
       NEW_FORWARDING_BEHAVIOR: true
-      BACK_PORT: ${BACK_PORT}
       CENTER_PORT: ${CENTER_PORT}
-      SERVICE: ${SERVICE}
     restart: unless-stopped
     cap_add:
       - NET_ADMIN

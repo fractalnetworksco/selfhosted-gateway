@@ -33,26 +33,26 @@ export LINK_DOMAIN=$2
 export EXPOSE=$3
 export FORWARD_ONLY="false"
 
-#if EXPOSE has a TCP:// or UDP://, set the appropriate protocol
-# Shape of EXPOSE should be TCP://forward_port:service:back_port
-# The forward_port is what is exposed from the gateway. It's best to set this to a known
-# default port for whatver service you're exposing
-# Back port might be best left as a wildcard
+# If EXPOSE has a TCP:// or UDP://, set the appropriate protocol.
+# The Shape of EXPOSE should be TCP://forward_port:service:back_port.
+# FORWARD_PORT is what is exposed from the gateway. It's best to set this to a known
+# default port for whatver service you're exposing.
+# BACK_PORT is whatever the service container is listening for.
+# -- 24/04/07 zacharylott94@gmail.com
 decompose_expose_into_parts() {
     local COPY_OF_EXPOSE=$1
     FORWARD_PROTOCOL=${COPY_OF_EXPOSE%%:*} 
-    export FORWARD_PROTOCOL=$( echo "$FORWARD_PROTOCOL" | tr '[:upper:]' '[:lower:]' ) # make sure our protocol is lowercase
-    COPY_OF_EXPOSE=${COPY_OF_EXPOSE#*://}                       #forward.service.back
+    export FORWARD_PROTOCOL=$( echo "$FORWARD_PROTOCOL" | tr '[:upper:]' '[:lower:]' ) # Make sure the protocol is lowercase
+    COPY_OF_EXPOSE=${COPY_OF_EXPOSE#*://}                                              # Should have the shape of "forward:service:back"
     export FORWARD_PORT=${COPY_OF_EXPOSE%%:*}
-    export BACK_PORT=${COPY_OF_EXPOSE##*:};
-    SERVICE=${COPY_OF_EXPOSE#*:}
-    export SERVICE=${SERVICE%:*};
-
+    export BACK_PORT=${COPY_OF_EXPOSE##*:}                                             # Used in the docker-compose snippet
+    SERVICE=${COPY_OF_EXPOSE#*:}                                                       
+    export SERVICE=${SERVICE%:*}                                                       # Used in the docker-compose snippet
 }
 
 raw_tcp_udp?() {
-    shopt -s nocasematch
-    [[ "$1" =~ udp:// ]] || [[ "$1" =~ tcp:// ]]; return $?;
+    shopt -s nocasematch # used to ignore case in the following regex checks
+    [[ "$1" =~ udp:// ]] || [[ "$1" =~ tcp:// ]]; return $?
 }
 
 if raw_tcp_udp? $EXPOSE; then
@@ -77,7 +77,7 @@ GATEWAY_IP=$(getent ahostsv4 "$LINK_DOMAIN" | awk '{print $1; exit}')
 
 LINK_CLIENT_WG_PUBKEY=$(echo $WG_PRIVKEY|wg pubkey)
 # LINK_ENV=$(ssh -o StrictHostKeyChecking=accept-new $SSH_HOST -p $SSH_PORT "bash -s" -- < ./remote.sh $CONTAINER_NAME $LINK_CLIENT_WG_PUBKEY > /dev/null 2>&1)
-LINK_ENV=$(ssh -o StrictHostKeyChecking=accept-new -o LogLevel=ERROR $SSH_HOST -p $SSH_PORT "bash -s" -- < ./remote.sh $CONTAINER_NAME $LINK_CLIENT_WG_PUBKEY $FORWARD_PORT $FORWARD_PROTOCOL $BACK_PORT)
+LINK_ENV=$(ssh -o StrictHostKeyChecking=accept-new -o LogLevel=ERROR $SSH_HOST -p $SSH_PORT "bash -s" -- < ./remote.sh $CONTAINER_NAME $LINK_CLIENT_WG_PUBKEY $FORWARD_PORT $FORWARD_PROTOCOL)
 
 # convert to array
 RESULT=($LINK_ENV)
@@ -99,8 +99,7 @@ else
   echo "# docker compose --env-file ./${CONTAINER_NAME}.env ..."
 
   cat link-compose-snippet.yml | envsubst
-
-  # TODO add support for WireGuard config output
-  # Fractal Networks is hiring: jobs@fractalnetworks.co
-
 fi
+
+# TODO add support for WireGuard config output
+# Fractal Networks is hiring: jobs@fractalnetworks.co

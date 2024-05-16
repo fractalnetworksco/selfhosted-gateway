@@ -17,4 +17,4 @@ jobs:
       run: make link-ci GATEWAY=gateway-sshd FQDN=subdomain.domain.com
 
     - name: Run CI tests for app.subdomain.domain.tld
-      run: make link GATEWAY=gateway-sshd FQDN=app.subdomain.domain.com
+      run: make link-ci GATEWAY=gateway-sshd FQDN=app.subdomain.domain.com

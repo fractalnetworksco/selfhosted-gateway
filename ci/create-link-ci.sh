@@ -48,7 +48,13 @@ if [ "$normal_test_proceed" = true ]; then
     docker compose -f $testLinkFile exec link ping 10.0.0.1 -c 1
     # assert http response code was 200
     # asserts basic auth is working with user: admin, password: admin
-
+    
+    if ! docker compose exec gateway curl -k -H "Authorization: Basic YWRtaW46YWRtaW4=" --resolve app.example.com:80:127.0.0.1 https://app.example.com -I |grep "HTTP/2 301"; then
+        FAILED="true"
+        echo -e "\033[0;31m Default Link curl FAILED\033[0m"     # red for failure
+    else
+        echo -e "\033[0;32m Default Link curl SUCCESS\033[0m"     # green for success
+    fi
     if ! docker compose exec gateway curl -k -H "Authorization: Basic YWRtaW46YWRtaW4=" --resolve app.example.com:443:127.0.0.1 https://app.example.com -I |grep "HTTP/2 200"; then
         FAILED="true"
         echo -e "\033[0;31m Default Link curl FAILED\033[0m"     # red for failure

@@ -13,5 +13,8 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Launch gateway and create link on gateway
-      run: make link-ci
+    - name: Run CI tests for subdomain.domain.tld 
+      run: make link-ci GATEWAY=gateway-sshd FQDN=subdomain.domain.com
+
+    - name: Run CI tests for app.subdomain.domain.tld
+      run: make link-ci GATEWAY=gateway-sshd FQDN=app.subdomain.domain.com

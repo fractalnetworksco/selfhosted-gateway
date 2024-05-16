@@ -5,15 +5,16 @@ server {
     server_name "~^(?<app>.+?)?\.(?<subdomain>.+?)?\.(?<domain>.+)\.(?<tld>.+)$" "~^(?<subdomain>.+)\.(?<domain>.+)\.(?<tld>.+)$" "~^(?<domain>.+)\.(?<tld>.+)$";
     #access_log  /var/log/nginx/host.access.log  main;
 
-    set $target http://$subdomain-$domain-$tld;
+        set $target http://$subdomain-$domain-$tld;
 
-    if ($app != '') {
-        set $target http://$app-$subdomain-$domain-$tld;
-    }
+   	if ($app != '') {
+	    set $target http://$app-$subdomain-$domain-$tld;
+    	}
 
 	if ($subdomain = '') {
             set $target http://$domain-$tld;
 	}
+
 	location /test {
 	    add_header Content-Type text/plain;
 	    return 200 "target: $target \napp: $app - subdomain: $subdomain - domain: $domain.$tld";

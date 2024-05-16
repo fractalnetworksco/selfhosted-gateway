@@ -6,6 +6,11 @@ server {
     #access_log  /var/log/nginx/host.access.log  main;
 
         set $target http://$subdomain-$domain-$tld;
+
+   	if ($app != '') {
+	    set $target http://$app-$subdomain-$domain-$tld;
+    	}
+
 	if ($subdomain = '') {
             set $target http://$domain-$tld;
 	}

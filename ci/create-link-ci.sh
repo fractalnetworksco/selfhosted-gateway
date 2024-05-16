@@ -12,7 +12,9 @@ docker compose up -d --build
 eval $(ssh-agent -s)
 ssh-add ./gateway-sim-key
 
-DASHED_FQDN="${1//./-}"
+FQDN=$2
+DASHED_FQDN="${2//./-}"
+
 
 
 testLinkFile=""   # Define the variable in a scope outside the cleanup function
@@ -44,20 +46,20 @@ if [ "$normal_test_proceed" = true ]; then
     docker run --network gateway -e SSH_AGENT_PID=$SSH_AGENT_PID -e SSH_AUTH_SOCK=$SSH_AUTH_SOCK -v $SSH_AUTH_SOCK:$SSH_AUTH_SOCK --rm fractalnetworks/gateway-cli:latest $1 $2 $3 >> $testLinkFile
     cat network.yaml >> $testLinkFile
     # set the gateway endpoint to the gateway link container
-    sed -i "s/^\(\s*GATEWAY_ENDPOINT:\).*/\1 $1:18521/" $testLinkFile
+    sed -i "s/^\(\s*GATEWAY_ENDPOINT:\).*/\1 $DASHED_FQDN:18521/" $testLinkFile
 
     docker compose -f $testLinkFile up -d --wait
     docker compose -f $testLinkFile exec link ping 10.0.0.1 -c 1
     # assert http response code was 200
     # asserts basic auth is working with user: admin, password: admin
     
-    if ! docker compose exec gateway curl -k -H "Authorization: Basic YWRtaW46YWRtaW4=" --resolve $1:80:127.0.0.1 http://app.example.com -I |grep "HTTP/1.1 308"; then
+    if ! docker compose exec gateway curl -k -H "Authorization: Basic YWRtaW46YWRtaW4=" --resolve $FQDN:80:127.0.0.1 http://app.example.com -I |grep "HTTP/1.1 308"; then
         FAILED="true"
         echo -e "\033[0;31m Default Link curl FAILED\033[0m"     # red for failure
     else
         echo -e "\033[0;32m Default Link curl SUCCESS\033[0m"     # green for success
     fi
-    if ! docker compose exec gateway curl -k -H "Authorization: Basic YWRtaW46YWRtaW4=" --resolve $1:443:127.0.0.1 https://app.example.com -I |grep "HTTP/2 200"; then
+    if ! docker compose exec gateway curl -k -H "Authorization: Basic YWRtaW46YWRtaW4=" --resolve $FQDN:443:127.0.0.1 https://app.example.com -I |grep "HTTP/2 200"; then
         FAILED="true"
         echo -e "\033[0;31m Default Link curl FAILED\033[0m"     # red for failure
     else
@@ -86,7 +88,7 @@ if [ "$caddy_greenlight" = true ]; then
 
     # Go inside $testLinkFile and change... (requires the commented options to be there! Can change later)
     # 1. gateway endpoint to the gateway link container
-    sed -i "s/^\(\s*GATEWAY_ENDPOINT:\).*/\1 $1:18521/" $testLinkFile
+    sed -i "s/^\(\s*GATEWAY_ENDPOINT:\).*/\1 $DASHED_FQDN:18521/" $testLinkFile
 
     # 2. CADDY_TLS_PROXY to ------------------------------------- true
     sed -i 's/^\(\s*\)#\s*CADDY_TLS_PROXY: true/\1CADDY_TLS_PROXY: true/' $testLinkFile
@@ -105,7 +107,7 @@ if [ "$caddy_greenlight" = true ]; then
     # assert http response code was 200
     # asserts basic auth is working with user: admin, password: admin
 
-    if ! docker compose exec gateway curl -v -k -H "Authorization: Basic YWRtaW46YWRtaW4=" --resolve $1:443:127.0.0.1 https://app.example.com -I 2>&1 |grep "HTTP/2 200"; then
+    if ! docker compose exec gateway curl -v -k -H "Authorization: Basic YWRtaW46YWRtaW4=" --resolve $FQDN:443:127.0.0.1 https://app.example.com -I 2>&1 |grep "HTTP/2 200"; then
         FAILED="true"
         echo -e "\033[0;31m Caddy TLS Link curl FAILED\033[0m"     # red for failure
     else

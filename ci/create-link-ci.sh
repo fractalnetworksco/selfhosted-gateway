@@ -49,7 +49,7 @@ if [ "$normal_test_proceed" = true ]; then
     # assert http response code was 200
     # asserts basic auth is working with user: admin, password: admin
     
-    if ! docker compose exec gateway curl -k -H "Authorization: Basic YWRtaW46YWRtaW4=" --resolve app.example.com:80:127.0.0.1 https://app.example.com -I |grep "HTTP/2 301"; then
+    if ! docker compose exec gateway curl -k -H "Authorization: Basic YWRtaW46YWRtaW4=" --resolve app.example.com:80:127.0.0.1 http://app.example.com -I |grep "HTTP/2 301"; then
         FAILED="true"
         echo -e "\033[0;31m Default Link curl FAILED\033[0m"     # red for failure
     else

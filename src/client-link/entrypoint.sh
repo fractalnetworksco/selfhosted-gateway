@@ -13,10 +13,10 @@ ip link set link0 up
 ip link set link0 mtu $LINK_MTU
 
 wg set link0 peer $GATEWAY_LINK_WG_PUBKEY allowed-ips 10.0.0.1/32 persistent-keepalive 30 endpoint $GATEWAY_ENDPOINT
-export EXPOSE=$(cat <<-END
+EXPOSE=$(cat <<-END
 $EXPOSE {
-        header_up X-Forwarded-Proto {scheme}
-    }
+         header_up X-Forwarded-Proto {scheme}
+       }
 END
 )
 if [ -z ${FORWARD_ONLY+x} ]; then
@@ -26,7 +26,7 @@ if [ -z ${FORWARD_ONLY+x} ]; then
         echo "Configure Caddy for use with TLS backend"
         if [ ! -z ${CADDY_TLS_INSECURE+x} ]; then   # if CADDY_TLS_INSECURE
             echo "Skip TLS verification"
-            export EXPOSE=$(cat <<-END
+            EXPOSE=$(cat <<-END
 $EXPOSE {
          transport http {
             tls
@@ -38,7 +38,7 @@ END
 )
 
         else    # CADDY_TLS_INSECURE is false
-            export EXPOSE=$(cat <<-END
+            EXPOSE=$(cat <<-END
 $EXPOSE {
          transport http {
             tls
@@ -77,6 +77,7 @@ END
 END
     )
     fi
+    export EXPOSE
     export TLS_INTERNAL_CONFIG
     envsubst < /etc/Caddyfile.template > $CADDYFILE
     caddy run --config $CADDYFILE

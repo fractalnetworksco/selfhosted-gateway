@@ -20,8 +20,6 @@ $LINK_DOMAIN {
     # optional internal tls
     $TLS_INTERNAL_CONFIG
 
-    reverse_proxy $EXPOSE {
-        header_up X-Forwarded-Proto {scheme}
-    }
+    reverse_proxy $EXPOSE
 
 }

@@ -21,28 +21,37 @@ if [ -z ${FORWARD_ONLY+x} ]; then
         echo "Configure Caddy for use with TLS backend"
         if [ ! -z ${CADDY_TLS_INSECURE+x} ]; then   # if CADDY_TLS_INSECURE
             echo "Skip TLS verification"
-            export EXPOSE=$(cat <<-END
+            EXPOSE=$(cat <<-END
 $EXPOSE {
          transport http {
             tls
             tls_insecure_skip_verify
             read_buffer 8192
          }
+         header_up X-Forwarded-Proto {scheme}
        }
 END
 )
 
         else    # CADDY_TLS_INSECURE is false
-            export EXPOSE=$(cat <<-END
+            EXPOSE=$(cat <<-END
 $EXPOSE {
          transport http {
             tls
             read_buffer 8192
          }
+         header_up X-Forwarded-Proto {scheme}
        }
 END
 )
         fi
+        else
+         EXPOSE=$(cat <<-END
+$EXPOSE {
+         header_up X-Forwarded-Proto {scheme}
+       }
+END
+)
     fi
 
     CADDYFILE='/etc/Caddyfile'
@@ -72,6 +81,7 @@ END
 END
     )
     fi
+    export EXPOSE
     export TLS_INTERNAL_CONFIG
     envsubst < /etc/Caddyfile.template > $CADDYFILE
     caddy run --config $CADDYFILE

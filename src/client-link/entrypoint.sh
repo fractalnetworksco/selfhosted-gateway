@@ -15,7 +15,7 @@ ip link set link0 mtu $LINK_MTU
 wg set link0 peer $GATEWAY_LINK_WG_PUBKEY allowed-ips 10.0.0.1/32 persistent-keepalive 30 endpoint $GATEWAY_ENDPOINT
 
 
-if [ "$FORWARD_ONLY" == "false" ]; then
+if [ -z ${FORWARD_ONLY+x} ]; then
 
     echo "Using caddy with SSL termination to forward traffic to app."
     if [ ! -z ${CADDY_TLS_PROXY+x} ]; then          # if CADDY_TLS_PROXY is set
@@ -95,7 +95,7 @@ else
         # In the future, specifying a protocol in the docker compose snippet may be necessary
         # -- 2024-04-07 zacharylott94@gmail.com
         socat TCP4-LISTEN:$CENTER_PORT,fork,reuseaddr TCP4:$EXPOSE,reuseaddr&
-        socat UDP4-LISTEN:$CENTER_PORT,fork,reuseaddr UDP4:$EXPOSE,reuseaddr 
+        socat UDP4-LISTEN:$CENTER_PORT,fork,reuseaddr UDP4:$EXPOSE,reuseaddr
     else
         echo "Caddy is disabled. Using socat to forward traffic to app."
         socat TCP4-LISTEN:8080,fork,reuseaddr TCP4:$EXPOSE,reuseaddr &

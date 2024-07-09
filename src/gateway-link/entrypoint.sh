@@ -48,7 +48,7 @@ else
     # Just opening both TCP and UDP is the quick and dirty way of ensuring both protocols work
     # In the future, specifying a protocol in the docker compose snippet may be necessary
     # -- 2024-04-03 Zach
-    socat TCP4-LISTEN:$CENTER_PORT,fork,reuseaddr TCP4:10.0.0.2:$CENTER_PORT,reuseaddr,fork &
-    socat UDP4-LISTEN:$CENTER_PORT,fork,reuseaddr UDP4:10.0.0.2:$CENTER_PORT,reuseaddr,fork
+    socat TCP4-LISTEN:$CENTER_PORT,fork,reuseaddr TCP4:10.0.0.2:$CENTER_PORT,reuseaddr &
+    socat UDP4-LISTEN:$CENTER_PORT,fork,reuseaddr UDP4:10.0.0.2:$CENTER_PORT,reuseaddr
 fi
 #socat TCP4-LISTEN:8443,fork,reuseaddr TCP4:$EXPOSE_HTTPS,reuseaddr

@@ -3,8 +3,16 @@ set -euxo pipefail
 
 echo $GATEWAY_CLIENT_WG_PRIVKEY > /etc/wireguard/link0.key
 
+cleanupLink() {
+    if ip link show link0 > /dev/null 2>&1; then
+        ip link delete link0
+    fi
+}
 
-ip link add link0 type wireguard
+if ! ip link show link0 > /dev/null 2>&1; then
+    trap cleanupLink EXIT
+    ip link add link0 type wireguard
+fi
 
 wg set link0 private-key /etc/wireguard/link0.key
 wg set link0 listen-port 18521

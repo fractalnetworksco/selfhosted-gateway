@@ -1,0 +1,14 @@
+services:
+  link:
+    image: fractalnetworks/gateway-client:latest
+    environment:
+      LINK_DOMAIN: ssh.gateway.host # resolves to same ip as gateway.host
+      EXPOSE: nginx:443
+      EXPOSE_HTTPS: nginx:443
+      GATEWAY_CLIENT_WG_PRIVKEY: OEG6zqDh3OxHvrhsLD2SG6cejORC8QF9HkXEsV2+w3I=
+      GATEWAY_LINK_WG_PUBKEY: H1AluWTxRGurIw/3RtUXXPCPAiQEZefvhgDY5OPoml4=
+      GATEWAY_ENDPOINT: gateway.host:32768
+      FORWARD_ONLY: true
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN

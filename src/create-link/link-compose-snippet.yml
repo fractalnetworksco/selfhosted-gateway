@@ -16,3 +16,9 @@
     restart: unless-stopped
     cap_add:
       - NET_ADMIN
+# #     uncomment to preserve tls certs
+#     volumes:
+#       - caddy_data:/data
+# # uncomment to preserve tls certs
+# volumes:
+#   caddy_data:

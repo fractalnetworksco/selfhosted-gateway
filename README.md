@@ -1,4 +1,8 @@
-# Self-hosted Gateway
+## A new version is under development
+Interested in getting involved with world changing open source software?
+Check out the next (WIP) iteration of this project: https://github.com/fractalnetworksco/fractal-link
+
+## Self-hosted Gateway
 **Jump to [Getting Started](#getting-started)**
 ## Features and Benefits
 - Docker native self-hosted alternative to Cloudflare Tunnels, Tailscale Funnel, ngrok and others.
@@ -205,20 +209,15 @@ services:
 $ docker ps
 ```
 
-### Limitations
-
-- Currently only IPv4 is supported
-- Raw UDP proxying is supported but is currently untested & undocumented, see bottom of `gateway/link-entrypoint.sh`.
-
 ### FAQ
 
 - How is this better than setting up nginx and WireGuard myself on a VPS?
 
-The goal of this project is to self-hosting more accessible and reproducible. This selfhosted-gateway leverages a "ZeroTrust" network architecture (see diagram above). Each "Link" provides a dedicated WireGuard tunnel that is isolated from other containers and the underlying. This isolation is provided by Docker Compose's creation of a private Docker network for each compose file (project).
+The goal of this project is to make self-hosting more accessible and reproducible. This project leverages a "ZeroTrust" network architecture. Each "Link" provides a dedicated WireGuard tunnel that is isolated from other containers and the underlying host. This isolation is provided by Docker Compose's creation of a private Docker network for each compose project.
 
 - Can I still access the service from my local network?
 
-You will need to expose ports in your Docker host as you would traditionally, but this is no longer necessary:
+Yes, just expose ports in your Docker host as you would normally:
 ```
 ports:
  - 80:80

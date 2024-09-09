@@ -208,8 +208,7 @@ services:
 
 It is possible to use Mutual TLS authentication for client connections, which is useful to prevent MITM attacks and reducing attack vector when running possibly insecure software in your containers. 
 
-You will need to create a self-signed CA certificate and sign X.509 client certificates, then use this snippet for your `compose.yaml` or your `.env` file:
-
+You will need to create a self-signed CA certificate and sign X.509 client certificates, then use this snippet for your `compose.yaml`
 ```yaml
 TLS_INTERNAL_CONFIG='tls {
         client_auth {
@@ -219,6 +218,20 @@ TLS_INTERNAL_CONFIG='tls {
             }
         }
     }
+```
+
+ or this for your `.env` file:
+```yaml
+      TLS_INTERNAL_CONFIG: |2
+        tls {
+                client_auth {
+                    mode require_and_verify
+                    trust_pool inline {
+                        trust_der YOUR_BASE64_ENCODED_CA_IN_DER_FORMAT_BELONGS_HERE
+                    }
+                }
+            }
+
 ```
 
 Now you won't be able to establish connections to your service withou your client certificate. There are other possible configuration values, of course, please have a look at the official [Caddy documentation](https://caddyserver.com/docs/caddyfile/directives/tls#client_auth). 
